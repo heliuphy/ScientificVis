@@ -22,155 +22,115 @@
 #include <vtkCamera.h>
 #include <vtkJPEGReader.h>
 #include <vtkImageReader2Factory.h>
+#include <iostream>
+#include <vtkMetaImageReader.h>
+#include <vtkMetaImageWriter.h>
+#include <vtkPolyDataWriter.h>
 
-int main(int argc, char* argv[])
-{
+using std::cout;
+using std::endl;
 
-  if(argc != 2)
-  {
-    std::cerr << "Required args: filename.jpeg/png......" << std::endl;
-    return EXIT_FAILURE;
-  }
+int main(int argc, char *argv[]) {
 
-  // Read the image
-  vtkSmartPointer<vtkImageReader2Factory> readerFactory =
-    vtkSmartPointer<vtkImageReader2Factory>::New();
-  vtkSmartPointer<vtkImageReader2> imageIn;
-  imageIn.TakeReference(
-    readerFactory->CreateImageReader2(argv[1]));
-  imageIn->SetFileName(argv[1]);
-  imageIn->Update();
+    if (argc != 3) {
+        cout << "./Program input.mhd output.mhd" << std::endl;
+        return EXIT_FAILURE;
+    }
 
-    // Define viewport ranges
-  // (xmin, ymin, xmax, ymax)
-  double originalViewport[4] = {0.0, 0.0, 0.5, 1.0};
-  double edgeViewport[4] = {0.5, 0.0, 1.0, 1.0};
+    vtkSmartPointer<vtkMetaImageReader> reader =
+        vtkSmartPointer<vtkMetaImageReader>::New();
 
-  vtkSmartPointer<vtkRenderer> originalRenderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  originalRenderer->SetViewport(originalViewport);
-  vtkSmartPointer<vtkRenderer> edgeRenderer =
-    vtkSmartPointer<vtkRenderer>::New();
-  edgeRenderer->SetViewport(edgeViewport);
+    reader->SetFileName(argv[1]);
+    reader->Update();
 
-  vtkSmartPointer<vtkRenderWindow> renderWindow =
-    vtkSmartPointer<vtkRenderWindow>::New();
-  renderWindow->SetSize(600,300);
-  renderWindow->SetMultiSamples(0);
-  renderWindow->AddRenderer(originalRenderer);
-  renderWindow->AddRenderer(edgeRenderer);
 
-  vtkSmartPointer<vtkRenderWindowInteractor> interactor =
-    vtkSmartPointer<vtkRenderWindowInteractor>::New();
-  interactor->SetRenderWindow(renderWindow);
+//    vtkSmartPointer<vtkImageLuminance> il =
+//            vtkSmartPointer<vtkImageLuminance>::New();
+//    il->SetInputConnection(imageIn->GetOutputPort());
+//
+//    vtkSmartPointer<vtkImageCast> ic =
+//            vtkSmartPointer<vtkImageCast>::New();
+//    ic->SetOutputScalarTypeToFloat();
+//    ic->SetInputConnection(il->GetOutputPort());
 
-  vtkSmartPointer<vtkImageActor> imageActor =
-    vtkSmartPointer<vtkImageActor>::New();
-  imageActor->SetInputData(imageIn->GetOutput());
+    // Smooth the image
+    vtkSmartPointer<vtkImageGaussianSmooth> gs =
+            vtkSmartPointer<vtkImageGaussianSmooth>::New();
+    gs->SetInputConnection(reader->GetOutputPort());
+    gs->SetDimensionality(2);
+    gs->SetRadiusFactors(1, 1, 0);
 
-  originalRenderer->AddActor(imageActor);
+    // Gradient the image
+    vtkSmartPointer<vtkImageGradient> imgGradient =
+            vtkSmartPointer<vtkImageGradient>::New();
+    imgGradient->SetInputConnection(gs->GetOutputPort());
+    imgGradient->SetDimensionality(2);
 
-  vtkSmartPointer<vtkImageLuminance> il =
-    vtkSmartPointer<vtkImageLuminance>::New();
-  il->SetInputConnection(imageIn->GetOutputPort());
+    vtkSmartPointer<vtkImageMagnitude> imgMagnitude =
+            vtkSmartPointer<vtkImageMagnitude>::New();
+    imgMagnitude->SetInputConnection(imgGradient->GetOutputPort());
 
-  vtkSmartPointer<vtkImageCast> ic =
-    vtkSmartPointer<vtkImageCast>::New();
-  ic->SetOutputScalarTypeToFloat();
-  ic->SetInputConnection(il->GetOutputPort());
+    // Non maximum suppression
+    vtkSmartPointer<vtkImageNonMaximumSuppression> nonMax =
+            vtkSmartPointer<vtkImageNonMaximumSuppression>::New();
+    imgMagnitude->Update();
+    nonMax->SetMagnitudeInputData(imgMagnitude->GetOutput());
+    imgGradient->Update();
+    nonMax->SetVectorInputData(imgGradient->GetOutput());
+    nonMax->SetDimensionality(2);
 
-  // Smooth the image
-  vtkSmartPointer<vtkImageGaussianSmooth> gs =
-    vtkSmartPointer<vtkImageGaussianSmooth>::New();
-  gs->SetInputConnection(ic->GetOutputPort());
-  gs->SetDimensionality(2);
-  gs->SetRadiusFactors(1, 1, 0);
+    vtkSmartPointer<vtkImageConstantPad> pad =
+            vtkSmartPointer<vtkImageConstantPad>::New();
+    pad->SetInputConnection(imgGradient->GetOutputPort());
+    pad->SetOutputNumberOfScalarComponents(3);
+    pad->SetConstant(0);
 
-  // Gradient the image
-  vtkSmartPointer<vtkImageGradient> imgGradient =
-    vtkSmartPointer<vtkImageGradient>::New();
-  imgGradient->SetInputConnection(gs->GetOutputPort());
-  imgGradient->SetDimensionality(2);
+    vtkSmartPointer<vtkImageToStructuredPoints> i2sp1 =
+            vtkSmartPointer<vtkImageToStructuredPoints>::New();
+    i2sp1->SetInputConnection(nonMax->GetOutputPort());
+    pad->Update();
+    i2sp1->SetVectorInputData(pad->GetOutput());
 
-  vtkSmartPointer<vtkImageMagnitude> imgMagnitude =
-    vtkSmartPointer<vtkImageMagnitude>::New();
-  imgMagnitude->SetInputConnection(imgGradient->GetOutputPort());
+    // Link edgles
+    vtkSmartPointer<vtkLinkEdgels> imgLink =
+            vtkSmartPointer<vtkLinkEdgels>::New();
+    imgLink->SetInputConnection(i2sp1->GetOutputPort());
+    imgLink->SetGradientThreshold(2);
 
-  // Non maximum suppression
-  vtkSmartPointer<vtkImageNonMaximumSuppression> nonMax =
-    vtkSmartPointer<vtkImageNonMaximumSuppression>::New();
-  imgMagnitude->Update();
-  nonMax->SetMagnitudeInputData(imgMagnitude->GetOutput());
-  imgGradient->Update();
-  nonMax->SetVectorInputData(imgGradient->GetOutput());
-  nonMax->SetDimensionality(2);
+    // Threshold links
+    vtkSmartPointer<vtkThreshold> thresholdEdgels =
+            vtkSmartPointer<vtkThreshold>::New();
+    thresholdEdgels->SetInputConnection(imgLink->GetOutputPort());
+    thresholdEdgels->ThresholdByUpper(10);
+    thresholdEdgels->AllScalarsOff();
 
-  vtkSmartPointer<vtkImageConstantPad> pad =
-    vtkSmartPointer<vtkImageConstantPad>::New();
-  pad->SetInputConnection(imgGradient->GetOutputPort());
-  pad->SetOutputNumberOfScalarComponents(3);
-  pad->SetConstant(0);
+    vtkSmartPointer<vtkGeometryFilter> gf =
+            vtkSmartPointer<vtkGeometryFilter>::New();
+    gf->SetInputConnection(thresholdEdgels->GetOutputPort());
 
-  vtkSmartPointer<vtkImageToStructuredPoints> i2sp1 =
-    vtkSmartPointer<vtkImageToStructuredPoints>::New();
-  i2sp1->SetInputConnection(nonMax->GetOutputPort());
-  pad->Update();
-  i2sp1->SetVectorInputData(pad->GetOutput());
+    vtkSmartPointer<vtkImageToStructuredPoints> i2sp =
+            vtkSmartPointer<vtkImageToStructuredPoints>::New();
+    i2sp->SetInputConnection(imgMagnitude->GetOutputPort());
+    pad->Update();
+    i2sp->SetVectorInputData(pad->GetOutput());
 
-  // Link edgles
-  vtkSmartPointer<vtkLinkEdgels> imgLink =
-    vtkSmartPointer<vtkLinkEdgels>::New();
-  imgLink->SetInputConnection(i2sp1->GetOutputPort());
-  imgLink->SetGradientThreshold(2);
+    // Subpixel them
+    vtkSmartPointer<vtkSubPixelPositionEdgels> spe =
+            vtkSmartPointer<vtkSubPixelPositionEdgels>::New();
+    spe->SetInputConnection(gf->GetOutputPort());
+    i2sp->Update();
+    spe->SetGradMapsData(i2sp->GetStructuredPointsOutput());
 
-  // Threshold links
-  vtkSmartPointer<vtkThreshold> thresholdEdgels =
-    vtkSmartPointer<vtkThreshold>::New();
-  thresholdEdgels->SetInputConnection(imgLink->GetOutputPort());
-  thresholdEdgels->ThresholdByUpper(10);
-  thresholdEdgels->AllScalarsOff();
+    vtkSmartPointer<vtkStripper> strip =
+            vtkSmartPointer<vtkStripper>::New();
+    strip->SetInputConnection(spe->GetOutputPort());
 
-  vtkSmartPointer<vtkGeometryFilter> gf =
-    vtkSmartPointer<vtkGeometryFilter>::New();
-  gf->SetInputConnection(thresholdEdgels->GetOutputPort());
+    vtkSmartPointer<vtkPolyDataWriter> writer =
+        vtkSmartPointer<vtkPolyDataWriter>::New();
 
-  vtkSmartPointer<vtkImageToStructuredPoints> i2sp =
-    vtkSmartPointer<vtkImageToStructuredPoints>::New();
-  i2sp->SetInputConnection(imgMagnitude->GetOutputPort());
-  pad->Update();
-  i2sp->SetVectorInputData(pad->GetOutput());
+    writer->SetFileName(argv[2]);
+    writer->SetInputConnection(strip->GetOutputPort());
+    writer->Write();
 
-  // Subpixel them
-  vtkSmartPointer<vtkSubPixelPositionEdgels> spe =
-    vtkSmartPointer<vtkSubPixelPositionEdgels>::New();
-  spe->SetInputConnection(gf->GetOutputPort());
-  i2sp->Update();
-  spe->SetGradMapsData(i2sp->GetStructuredPointsOutput());
-
-  vtkSmartPointer<vtkStripper> strip =
-    vtkSmartPointer<vtkStripper>::New();
-  strip->SetInputConnection(spe->GetOutputPort());
-
-  vtkSmartPointer<vtkPolyDataMapper> dsm =
-    vtkSmartPointer<vtkPolyDataMapper>::New();
-  dsm->SetInputConnection(strip->GetOutputPort());
-  dsm->ScalarVisibilityOff();
-
-  vtkSmartPointer<vtkActor> planeActor =
-    vtkSmartPointer<vtkActor>::New();
-  planeActor->SetMapper(dsm);
-  planeActor->GetProperty()->SetAmbient(1.0);
-  planeActor->GetProperty()->SetDiffuse(0.0);
-
-  // Add the actors to the renderer, set the background and size
-  edgeRenderer->AddActor(planeActor);
-
-  // Render the image
-  interactor->Initialize();
-  renderWindow->Render();
-  renderWindow->Render();
-
-  interactor->Start();
-
-  return EXIT_SUCCESS;
+    return EXIT_SUCCESS;
 }

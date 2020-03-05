@@ -11,14 +11,20 @@
 #include <vtkJPEGReader.h>
 #include <vtkImageLaplacian.h>
 #include <vtkPNGReader.h>
+#include <vtkMetaImageReader.h>
+#include <vtkMetaImageWriter.h>
+
+using std::cout;
+using std::endl;
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        std::cout << argv[0] << " " << "ImageFile(*.png)" << std::endl;
+    if (argc != 3) {
+        cout << "./program file1.mhd file2" << endl;
         return EXIT_FAILURE;
     }
-    vtkSmartPointer<vtkPNGReader> reader =
-            vtkSmartPointer<vtkPNGReader>::New();
+
+    vtkSmartPointer<vtkMetaImageReader> reader =
+            vtkSmartPointer<vtkMetaImageReader>::New();
     reader->SetFileName(argv[1]);
     reader->Update();
 
@@ -30,56 +36,19 @@ int main(int argc, char *argv[]) {
     double range[2];
     lapFilter->GetOutput()->GetScalarRange(range);
 
-    vtkSmartPointer<vtkImageShiftScale> ShiftScale =
-            vtkSmartPointer<vtkImageShiftScale>::New();
-    ShiftScale->SetOutputScalarTypeToUnsignedChar();
-    ShiftScale->SetScale(255 / (range[1] - range[0]));
-    ShiftScale->SetShift(-range[0]);
-    ShiftScale->SetInputConnection(lapFilter->GetOutputPort());
-    ShiftScale->Update();
+//    vtkSmartPointer<vtkImageShiftScale> ShiftScale =
+//            vtkSmartPointer<vtkImageShiftScale>::New();
+//    ShiftScale->SetOutputScalarTypeToUnsignedChar();
+//    ShiftScale->SetScale(255 / (range[1] - range[0]));
+//    ShiftScale->SetShift(-range[0]);
+//    ShiftScale->SetInputConnection(lapFilter->GetOutputPort());
+//    ShiftScale->Update();
 
-    vtkSmartPointer<vtkImageActor> originalActor =
-            vtkSmartPointer<vtkImageActor>::New();
-    originalActor->SetInputData(reader->GetOutput());
-
-    vtkSmartPointer<vtkImageActor> gradActor =
-            vtkSmartPointer<vtkImageActor>::New();
-    gradActor->SetInputData(ShiftScale->GetOutput());
-
-    double originalViewport[4] = {0.0, 0.0, 0.5, 1.0};
-    double gradviewport[4] = {0.5, 0.0, 1.0, 1.0};
-
-    vtkSmartPointer<vtkRenderer> originalRenderer =
-            vtkSmartPointer<vtkRenderer>::New();
-    originalRenderer->SetViewport(originalViewport);
-    originalRenderer->AddActor(originalActor);
-    originalRenderer->ResetCamera();
-    originalRenderer->SetBackground(1.0, 1.0, 1.0);
-
-    vtkSmartPointer<vtkRenderer> gradRenderer =
-            vtkSmartPointer<vtkRenderer>::New();
-    gradRenderer->SetViewport(gradviewport);
-    gradRenderer->AddActor(gradActor);
-    gradRenderer->ResetCamera();
-    gradRenderer->SetBackground(1.0, 1.0, 1.0);
-
-    vtkSmartPointer<vtkRenderWindow> renderWindow =
-            vtkSmartPointer<vtkRenderWindow>::New();
-    renderWindow->AddRenderer(originalRenderer);
-    renderWindow->AddRenderer(gradRenderer);
-    renderWindow->SetSize(640, 320);
-    renderWindow->Render();
-    renderWindow->SetWindowName("LaplacianExample");
-
-    vtkSmartPointer<vtkRenderWindowInteractor> renderWindowInteractor =
-            vtkSmartPointer<vtkRenderWindowInteractor>::New();
-    vtkSmartPointer<vtkInteractorStyleImage> style =
-            vtkSmartPointer<vtkInteractorStyleImage>::New();
-
-    renderWindowInteractor->SetInteractorStyle(style);
-    renderWindowInteractor->SetRenderWindow(renderWindow);
-    renderWindowInteractor->Initialize();
-    renderWindowInteractor->Start();
+    vtkSmartPointer<vtkMetaImageWriter> writer =
+        vtkSmartPointer<vtkMetaImageWriter>::New();
+    writer->SetFileName(argv[2]);
+    writer->SetInputConnection(lapFilter->GetOutputPort());
+    writer->Write();
 
     return EXIT_SUCCESS;
 }
