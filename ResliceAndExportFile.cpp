@@ -53,6 +53,10 @@ int main(int argc, char **argv) {
     center[1] = origin[1] + spacing[1] * 0.5 * (extent[2] + extent[3]);
     center[2] = origin[2] + spacing[2] * 0.5 * (extent[4] + extent[5]);
 
+    std::cout << "extent: " << extent[0] << " " << extent[1] << " " << extent[2];
+    std::cout << " " << extent[3] << " " << extent[4] << " " << extent[5] << endl;
+    std::cout << "center: " << center[0] << " " << center[1] << " " << center[2] << endl;
+
     // Define slice matrix
     static double axialElements[16] = {
             1, 0, 0, 0,

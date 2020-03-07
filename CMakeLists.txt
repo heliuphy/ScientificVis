@@ -18,3 +18,21 @@ target_link_libraries(ResliceAndExportFile ${VTK_LIBRARIES})
 
 add_executable(ImageGradientMagnitude ImageGradientMagnitude)
 target_link_libraries(ImageGradientMagnitude ${VTK_LIBRARIES})
+
+add_executable(ImageAccumulateGreyscale ImageAccumulateGreyscale)
+target_link_libraries(ImageAccumulateGreyscale ${VTK_LIBRARIES})
+
+add_executable(PseudoVolumeRendering PseudoVolumeRendering)
+target_link_libraries(PseudoVolumeRendering ${VTK_LIBRARIES})
+
+add_executable(BinaryByThreshold BinaryByThreshold)
+target_link_libraries(BinaryByThreshold ${VTK_LIBRARIES})
+
+add_executable(BinaryByEightNeighbor BinaryByEightNeighbor)
+target_link_libraries(BinaryByEightNeighbor ${VTK_LIBRARIES})
+
+add_executable(PrintLine PrintLine)
+target_link_libraries(PrintLine ${VTK_LIBRARIES})
+
+add_executable(FindBinaryInnerCircle FindBinaryInnerCircle)
+target_link_libraries(FindBinaryInnerCircle ${VTK_LIBRARIES})
