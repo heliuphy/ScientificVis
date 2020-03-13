@@ -36,3 +36,6 @@ target_link_libraries(PrintLine ${VTK_LIBRARIES})
 
 add_executable(FindBinaryInnerCircle FindBinaryInnerCircle)
 target_link_libraries(FindBinaryInnerCircle ${VTK_LIBRARIES})
+
+add_executable(MetaImageToPNG MetaImageToPNG)
+target_link_libraries(MetaImageToPNG ${VTK_LIBRARIES})

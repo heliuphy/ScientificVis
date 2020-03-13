@@ -6,7 +6,6 @@
 #include <vtkImageData.h>
 #include <iostream>
 #include <vtkMetaImageReader.h>
-#include <vtkImageIterator.h>
 #include <vtkMetaImageWriter.h>
 #include <vtkExtractVOI.h>
 
@@ -97,6 +96,43 @@ int deleteOuterCircleRight(vtkImageData *inputImage, int _extent[6]) {
     return 0;
 }
 
+int deleteOuterCircleLeftUp(vtkImageData *inputImage, int _extent[6]) {
+    int deltaX = _extent[1] - _extent[0];
+    int deltaY = _extent[3] - _extent[2];
+    int shortestDelta = deltaX > deltaY ? deltaY : deltaX;
+    unsigned char *_left = nullptr, *_right = nullptr;
+    for (int i = _extent[1] - shortestDelta, j = _extent[3]; i <= _extent[1]; i++, j--) {
+        auto _pixel = (unsigned char *) (inputImage->GetScalarPointer(i, j, 0));
+        if (*_pixel == 255 && _left == nullptr) {
+            _left = _pixel;
+        } else if (*_pixel == 255 && _left != nullptr) {
+            *_left = 0;
+            break;
+        } else {
+            continue;
+        }
+    }
+    return 0;
+}
+
+int deleteOuterCircleRightUp(vtkImageData *inputImage, int _extent[6]) {
+    int deltaX = _extent[1] - _extent[0];
+    int deltaY = _extent[3] - _extent[2];
+    int shortestDelta = deltaX > deltaY ? deltaY : deltaX;
+    unsigned char *_left = nullptr, *_right = nullptr;
+    for (int i = _extent[1] - shortestDelta, j = _extent[3]; i <= _extent[1]; i++, j--) {
+        auto _pixel = (unsigned char *) (inputImage->GetScalarPointer(i, j, 0));
+        if (*_pixel == 255 && _left == nullptr) {
+            _left = _pixel;
+        } else if (*_pixel == 255 && _left != nullptr) {
+            *_left = 0;
+            break;
+        } else {
+            continue;
+        }
+    }
+    return 0;
+}
 int main(int argc, char **argv) {
 
     /**
@@ -217,17 +253,19 @@ int main(int argc, char **argv) {
     int oneThree = VOILength / 3;
     int fiveSix = VOILength / 6 * 5;
 
-    int upExtent[6] = {VOIStart + oneSix, VOIEnd - oneSix, VOIEnd - oneThree, VOIEnd, 0, 0};
-    deleteOuterCircleUp(VOIImageData, upExtent);
-
-    int downExtent[6] = {VOIStart + oneSix, VOIEnd - oneSix, VOIStart, VOIStart + oneThree, 0, 0};
-    deleteOuterCircleDown(VOIImageData, downExtent);
-
-    int leftExtent[6] = {VOIStart, VOIStart + oneThree, VOIStart + oneSix, VOIEnd - oneSix, 0, 0};
-    deleteOuterCircleLeft(VOIImageData, leftExtent);
-
-    int rightExtent[6] = {VOIEnd - oneThree, VOIEnd, VOIStart + oneSix, VOIEnd - oneSix, 0, 0};
-    deleteOuterCircleRight(VOIImageData, rightExtent);
+//    int upExtent[6] = {VOIStart + oneSix, VOIEnd - oneSix, VOIEnd - oneThree, VOIEnd, 0, 0};
+//    deleteOuterCircleUp(VOIImageData, upExtent);
+//
+//    int downExtent[6] = {VOIStart + oneSix, VOIEnd - oneSix, VOIStart, VOIStart + oneThree, 0, 0};
+//    deleteOuterCircleDown(VOIImageData, downExtent);
+//
+//    int leftExtent[6] = {VOIStart, VOIStart + oneThree, VOIStart + oneSix, VOIEnd - oneSix, 0, 0};
+//    deleteOuterCircleLeft(VOIImageData, leftExtent);
+//
+//    int rightExtent[6] = {VOIEnd - oneThree, VOIEnd, VOIStart + oneSix, VOIEnd - oneSix, 0, 0};
+//    deleteOuterCircleRight(VOIImageData, rightExtent);
+    int leftUpExtent[6] = {VOIStart, VOIStart + oneThree, VOIEnd - oneThree, VOIEnd, 0, 0};
+    deleteOuterCircleLeftUp(VOIImageData, leftUpExtent);
 
     vtkSmartPointer<vtkMetaImageWriter> writer =
             vtkSmartPointer<vtkMetaImageWriter>::New();
