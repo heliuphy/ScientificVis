@@ -41,7 +41,9 @@ MESSAGE("matlab include dir is " ${MATLAB_INCLUDE_DIRS})
 # 用来编译库
 ADD_SUBDIRECTORY(Canny)
 ADD_SUBDIRECTORY(ImageFill)
-ADD_SUBDIRECTORY(example)
+ADD_SUBDIRECTORY(fillTest)
+ADD_SUBDIRECTORY(cannyTest)
+ADD_SUBDIRECTORY(CannyAndFill)
 
 # 设置可执行文件的源文件
 #SET(SRC_LIST main.cpp)

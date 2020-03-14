@@ -8,7 +8,7 @@
 // Include Files
 #include "rt_nonfinite.h"
 #include "ImageFill.h"
-#include "imfill.h"
+#include "IF_imfill.h"
 #include "libmwippreconstruct.h"
 
 // Function Definitions

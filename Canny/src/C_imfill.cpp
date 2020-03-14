@@ -1,7 +1,7 @@
 // Include Files
 #include "rt_nonfinite.h"
 #include "CannyAutoThres.h"
-#include "imfill.h"
+#include "C_imfill.h"
 #include "CannyAutoThres_emxutil.h"
 #include "nullAssignment.h"
 #include "any1.h"

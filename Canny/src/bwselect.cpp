@@ -10,7 +10,7 @@
 #include "CannyAutoThres.h"
 #include "bwselect.h"
 #include "CannyAutoThres_emxutil.h"
-#include "imfill.h"
+#include "C_imfill.h"
 #include "nullAssignment.h"
 #include "round.h"
 
