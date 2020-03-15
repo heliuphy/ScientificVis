@@ -14,6 +14,26 @@
 #include <vtkMetaImageReader.h>
 #include <vtkPNGWriter.h>
 #include <vtkMetaImageWriter.h>
+#include <vtkImageMathematics.h>
+#include "utils/HlwUtils.h"
+
+void findPointIDToImfill(vtkImageData *planeImageData, double *p1, double *p2) {
+    int planeExtent[6];
+    planeImageData->GetExtent(planeExtent);
+
+    int horizontalLineExtent[6] = {0, 0, 0, 0, 0, 0};
+    horizontalLineExtent[1] = planeExtent[1];
+    horizontalLineExtent[2] = (planeExtent[3] - planeExtent[2]) / 2;
+    horizontalLineExtent[3] = horizontalLineExtent[2];
+    horizontalLineExtent[4] = planeExtent[4];
+    horizontalLineExtent[5] = planeExtent[5];
+
+    printArray<int>(planeExtent, 6, "planeExtent");
+    printArray<int>(horizontalLineExtent, 6, "horizonExtent");
+
+    
+
+}
 
 int main(int argc, char **argv) {
     // Initialize
@@ -53,18 +73,26 @@ int main(int argc, char **argv) {
     double p1 = 161207, p2 = 204410;
     ImageFill(afterCannyDataPointer, p1, p2, outputDataPointer);
 
-    // Save file
-    vtkSmartPointer<vtkMetaImageWriter> writer =
-            vtkSmartPointer<vtkMetaImageWriter>::New();
-    writer->SetFileName(argv[2]);
-    writer->SetInputData(outputImageData);
-    writer->Write();
+    // 计算两图之差
+    vtkSmartPointer<vtkImageMathematics> imageMath =
+            vtkSmartPointer<vtkImageMathematics>::New();
+    imageMath->SetInput1Data(outputImageData);
+    imageMath->SetInput2Data(afterCannyImageData);
+    imageMath->SetOperationToSubtract();
+    imageMath->Update();
 
-//    vtkSmartPointer<vtkPNGWriter> writer =
-//            vtkSmartPointer<vtkPNGWriter>::New();
+    double *pointID1 = nullptr, *pointID2 = nullptr;
+    findPointIDToImfill(afterCannyImageData, pointID1, pointID2);
+
+    // Save file
+//    vtkSmartPointer<vtkMetaImageWriter> writer =
+//            vtkSmartPointer<vtkMetaImageWriter>::New();
 //    writer->SetFileName(argv[2]);
-//    writer->SetInputData(outputImageData);
+////    writer->SetInputData(outputImageData);
+//    writer->SetInputConnection(imageMath->GetOutputPort());
 //    writer->Write();
+
+
     // Clean
     ImageFill_terminate();
     CannyAutoThres_terminate();
