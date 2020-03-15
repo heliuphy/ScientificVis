@@ -9,3 +9,6 @@ LINK_LIBRARIES(${PROJECT_BINARY_DIR}/ImageFill)
 
 ADD_EXECUTABLE(CannyAndFill ${MAIN_SRC_FILE} utils/HlwUtils.cpp)
 TARGET_LINK_LIBRARIES(CannyAndFill myCanny imageFill)
+
+#ADD_EXECUTABLE(TestMatlabFillPointID TestMatlabFillPointID.cpp)
+#TARGET_LINK_LIBRARIES(TestMatlabFillPointID imageFill)
