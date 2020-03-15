@@ -58,10 +58,15 @@ void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *
         pointIDs[i] = afterCannyImageData->ComputePointId(ijk);
     }
 
+    *p1 = (pointIDs[0] + pointIDs[1]) / 2;
+    *p2 = (pointIDs[2] + pointIDs[3]) / 2;
+
     printArray<int>(edgeArray, 4, "edgeArray");
     printArray<vtkIdType>(pointIDs, 4, "pointIDs");
 
 }
+
+
 
 int main(int argc, char **argv) {
     // Initialize
@@ -98,8 +103,14 @@ int main(int argc, char **argv) {
     // Canny Edge Detection
     CannyAutoThres(inputDataPointer, afterCannyDataPointer);
     // Fill
-    double p1 = 161207, p2 = 204410;
-    ImageFill(afterCannyDataPointer, p1, p2, outputDataPointer);
+//    double p1 = 161207, p2 = 204410;
+    double *p1 = (double *) malloc(sizeof(double));
+    double *p2 = (double *) malloc(sizeof(double));
+
+    findPointIDToImfill(afterCannyImageData, p1, p2);
+    cout << "p1 and p2 " << endl;
+    cout << *p1 << " " << *p2 << endl;
+    ImageFill(afterCannyDataPointer, *p1, *p2, outputDataPointer);
 
     // 计算两图之差
     vtkSmartPointer<vtkImageMathematics> imageMath =
@@ -109,16 +120,13 @@ int main(int argc, char **argv) {
     imageMath->SetOperationToSubtract();
     imageMath->Update();
 
-    double *pointID1 = nullptr, *pointID2 = nullptr;
-    findPointIDToImfill(afterCannyImageData, pointID1, pointID2);
 
-    // Save file
-//    vtkSmartPointer<vtkMetaImageWriter> writer =
-//            vtkSmartPointer<vtkMetaImageWriter>::New();
-//    writer->SetFileName(argv[2]);
-////    writer->SetInputData(outputImageData);
-//    writer->SetInputConnection(imageMath->GetOutputPort());
-//    writer->Write();
+//     Save file
+    vtkSmartPointer<vtkMetaImageWriter> writer =
+            vtkSmartPointer<vtkMetaImageWriter>::New();
+    writer->SetFileName(argv[2]);
+    writer->SetInputConnection(imageMath->GetOutputPort());
+    writer->Write();
 
 
     // Clean
