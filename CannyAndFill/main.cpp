@@ -184,13 +184,26 @@ int main(int argc, char **argv) {
                            afterSub,
                            CANNY_FILL_AND_SUB);
 
+    vtkSmartPointer<vtkImageMathematics> multiply255 =
+        vtkSmartPointer<vtkImageMathematics>::New();
+    multiply255->SetInput1Data(afterSub->GetOutput());
+    multiply255->SetOperationToMultiplyByK();
+    multiply255->SetConstantK(255);
+    multiply255->Update();
 //     Save file
-    vtkSmartPointer<vtkMetaImageWriter> writer =
-            vtkSmartPointer<vtkMetaImageWriter>::New();
+//    vtkSmartPointer<vtkMetaImageWriter> writer =
+//            vtkSmartPointer<vtkMetaImageWriter>::New();
+//    writer->SetFileName(argv[2]);
+//    writer->SetInputConnection(multiply255->GetOutputPort());
+////    writer->SetInputData(afterSub->GetOutput());
+//    writer->Write();
+
+    vtkSmartPointer<vtkPNGWriter> writer =
+        vtkSmartPointer<vtkPNGWriter>::New();
     writer->SetFileName(argv[2]);
-    writer->SetInputConnection(afterSub->GetOutputPort());
-//    writer->SetInputData(afterSub->GetOutput());
+    writer->SetInputConnection(multiply255->GetOutputPort());
     writer->Write();
+
 
     return 0;
 }
