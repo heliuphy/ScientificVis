@@ -17,6 +17,10 @@
 #include <vtkImageMathematics.h>
 #include "utils/HlwUtils.h"
 
+#define CANNY_ONLY 0
+#define CANNY_AND_FILL 1
+#define CANNY_FILL_AND_SUB 2
+
 void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *p2) {
     int planeExtent[6];
     afterCannyImageData->GetExtent(planeExtent);
@@ -66,20 +70,93 @@ void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *
 
 }
 
+void
+planeBoundaryDetection(vtkImageData *_inputImageData,
+                       vtkImageData *_afterCannyImageData,
+                       vtkImageData *_afterCannyAndFillImageData,
+                       vtkImageMathematics *_afterSub,
+                       int _options) {
+    bool _doCanny = false;
+    bool _doFill = false;
+    bool _doSub = false;
 
 
-int main(int argc, char **argv) {
+    auto _inputImagePointer = (float *) (_inputImageData->GetScalarPointer());
+    auto _afterCannyImagePointer = (boolean_T *) (_afterCannyImageData->GetScalarPointer());
+    auto _afterCannyAndFillImagePointer = (boolean_T *) (_afterCannyAndFillImageData->GetScalarPointer());
+
+    switch (_options) {
+        case CANNY_ONLY:
+            _doCanny = true;
+            break;
+        case CANNY_AND_FILL:
+            _doCanny = true;
+            _doFill = true;
+            break;
+        case CANNY_FILL_AND_SUB:
+            _doCanny = true;
+            _doFill = true;
+            _doSub = true;
+            break;
+        default:
+            cout << "planeBoundaryDetection option err !" << endl;
+            return;
+    }
+
+    // Always Do Canny
+
     // Initialize
     CannyAutoThres_initialize();
-    ImageFill_initialize();
 
-    // Main program logic
+
+    // Canny Edge Detection
+    CannyAutoThres(_inputImagePointer, _afterCannyImagePointer);
+
+    if (_doFill) {
+        ImageFill_initialize();
+        // Fill
+        double *p1 = (double *) malloc(sizeof(double));
+        double *p2 = (double *) malloc(sizeof(double));
+
+        findPointIDToImfill(_afterCannyImageData, p1, p2);
+
+        cout << "p1 and p2 " << endl;
+        cout << *p1 << " " << *p2 << endl;
+
+        ImageFill(_afterCannyImagePointer, *p1, *p2, _afterCannyAndFillImagePointer);
+
+        if (_doSub) {
+            // 计算两图之差
+            _afterSub->SetInput1Data(_afterCannyAndFillImageData);
+            _afterSub->SetInput2Data(_afterCannyImageData);
+            _afterSub->SetOperationToSubtract();
+            _afterSub->Update();
+        }
+        // Clean
+        ImageFill_terminate();
+    }
+
+    // Clean
+    CannyAutoThres_terminate();
+
+}
+
+int main(int argc, char **argv) {
     vtkSmartPointer<vtkMetaImageReader> reader =
             vtkSmartPointer<vtkMetaImageReader>::New();
     reader->SetFileName(argv[1]);
     reader->Update();
 
     vtkSmartPointer<vtkImageData> inputImageData = reader->GetOutput();
+
+//    vtkSmartPointer<vtkImageData> outputImageData =
+//            vtkSmartPointer<vtkImageData>::New();
+//
+//    outputImageData->SetOrigin(inputImageData->GetOrigin());
+//    outputImageData->SetExtent(inputImageData->GetExtent());
+//    outputImageData->SetSpacing(inputImageData->GetSpacing());
+//    outputImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+//    auto outputImageDataPointer = (boolean_T *) (outputImageData->GetScalarPointer());
 
     vtkSmartPointer<vtkImageData> afterCannyImageData =
             vtkSmartPointer<vtkImageData>::New();
@@ -89,48 +166,31 @@ int main(int argc, char **argv) {
     afterCannyImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 
-    vtkSmartPointer<vtkImageData> outputImageData =
+    vtkSmartPointer<vtkImageData> afterCannyAndFillImageData =
             vtkSmartPointer<vtkImageData>::New();
-    outputImageData->SetOrigin(inputImageData->GetOrigin());
-    outputImageData->SetExtent(inputImageData->GetExtent());
-    outputImageData->SetSpacing(inputImageData->GetSpacing());
-    outputImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+    afterCannyAndFillImageData->SetOrigin(inputImageData->GetOrigin());
+    afterCannyAndFillImageData->SetExtent(inputImageData->GetExtent());
+    afterCannyAndFillImageData->SetSpacing(inputImageData->GetSpacing());
+    afterCannyAndFillImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
-    auto inputDataPointer = (float *) (inputImageData->GetScalarPointer());
-    auto afterCannyDataPointer = (boolean_T *) (afterCannyImageData->GetScalarPointer());
-    auto outputDataPointer = (boolean_T *) (outputImageData->GetScalarPointer());
 
-    // Canny Edge Detection
-    CannyAutoThres(inputDataPointer, afterCannyDataPointer);
-    // Fill
-//    double p1 = 161207, p2 = 204410;
-    double *p1 = (double *) malloc(sizeof(double));
-    double *p2 = (double *) malloc(sizeof(double));
-
-    findPointIDToImfill(afterCannyImageData, p1, p2);
-    cout << "p1 and p2 " << endl;
-    cout << *p1 << " " << *p2 << endl;
-    ImageFill(afterCannyDataPointer, *p1, *p2, outputDataPointer);
-
-    // 计算两图之差
-    vtkSmartPointer<vtkImageMathematics> imageMath =
+    vtkSmartPointer<vtkImageMathematics> afterSub =
             vtkSmartPointer<vtkImageMathematics>::New();
-    imageMath->SetInput1Data(outputImageData);
-    imageMath->SetInput2Data(afterCannyImageData);
-    imageMath->SetOperationToSubtract();
-    imageMath->Update();
 
+
+    planeBoundaryDetection(inputImageData,
+                           afterCannyImageData,
+                           afterCannyAndFillImageData,
+                           afterSub,
+                           CANNY_FILL_AND_SUB);
 
 //     Save file
     vtkSmartPointer<vtkMetaImageWriter> writer =
             vtkSmartPointer<vtkMetaImageWriter>::New();
     writer->SetFileName(argv[2]);
-    writer->SetInputConnection(imageMath->GetOutputPort());
+    writer->SetInputConnection(afterSub->GetOutputPort());
+//    writer->SetInputData(afterSub->GetOutput());
     writer->Write();
 
-
-    // Clean
-    ImageFill_terminate();
-    CannyAutoThres_terminate();
     return 0;
 }
