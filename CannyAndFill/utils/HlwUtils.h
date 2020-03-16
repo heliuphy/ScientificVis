@@ -21,4 +21,10 @@ void printArray(T* array, int size, string arrayName) {
     cout << endl;
 }
 
+template <class T>
+void deepCopyArray(T* inputArray, T* outputArray, int size) {
+    for (int i = 0; i < size; i++) {
+        outputArray[i] = inputArray[i];
+    }
+}
 #endif //MYPROJ_HLWUTILS_H

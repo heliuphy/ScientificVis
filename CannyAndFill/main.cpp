@@ -71,7 +71,7 @@ void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *
 }
 
 void
-planeBoundaryDetection(vtkImageData *_inputImageData,
+planeBoundaryDetection(float *_inputImageDataPointer,
                        vtkImageData *_afterCannyImageData,
                        vtkImageData *_afterCannyAndFillImageData,
                        vtkImageMathematics *_afterSub,
@@ -81,7 +81,6 @@ planeBoundaryDetection(vtkImageData *_inputImageData,
     bool _doSub = false;
 
 
-    auto _inputImagePointer = (float *) (_inputImageData->GetScalarPointer());
     auto _afterCannyImagePointer = (boolean_T *) (_afterCannyImageData->GetScalarPointer());
     auto _afterCannyAndFillImagePointer = (boolean_T *) (_afterCannyAndFillImageData->GetScalarPointer());
 
@@ -110,7 +109,7 @@ planeBoundaryDetection(vtkImageData *_inputImageData,
 
 
     // Canny Edge Detection
-    CannyAutoThres(_inputImagePointer, _afterCannyImagePointer);
+    CannyAutoThres(_inputImageDataPointer, _afterCannyImagePointer);
 
     if (_doFill) {
         ImageFill_initialize();
@@ -147,30 +146,47 @@ int main(int argc, char **argv) {
     reader->SetFileName(argv[1]);
     reader->Update();
 
-    vtkSmartPointer<vtkImageData> inputImageData = reader->GetOutput();
+    vtkSmartPointer<vtkMetaImageReader> planeReader =
+            vtkSmartPointer<vtkMetaImageReader>::New();
+    planeReader->SetFileName(argv[2]);
+    planeReader->Update();
 
-//    vtkSmartPointer<vtkImageData> outputImageData =
-//            vtkSmartPointer<vtkImageData>::New();
-//
-//    outputImageData->SetOrigin(inputImageData->GetOrigin());
-//    outputImageData->SetExtent(inputImageData->GetExtent());
-//    outputImageData->SetSpacing(inputImageData->GetSpacing());
-//    outputImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-//    auto outputImageDataPointer = (boolean_T *) (outputImageData->GetScalarPointer());
+    vtkSmartPointer<vtkImageData> input3DImageData = reader->GetOutput();
+    vtkSmartPointer<vtkImageData> planeImageData = planeReader->GetOutput();
+
+
+    double input3DOrigin[3];
+    double input3DSpacing[3];
+    int input3DExtent[6];
+
+    input3DImageData->GetOrigin(input3DOrigin);
+    input3DImageData->GetSpacing(input3DSpacing);
+    input3DImageData->GetExtent(input3DExtent);
+
+    double tempPlaneOrigin[3];
+    double tempPlaneSpacing[3];
+    int tempPlaneExtent[6];
+
+
+    planeImageData->GetOrigin(tempPlaneOrigin);
+    planeImageData->GetSpacing(tempPlaneSpacing);
+    planeImageData->GetExtent(tempPlaneExtent);
+
+    float *tempPlanePointer = nullptr;
 
     vtkSmartPointer<vtkImageData> afterCannyImageData =
             vtkSmartPointer<vtkImageData>::New();
-    afterCannyImageData->SetOrigin(inputImageData->GetOrigin());
-    afterCannyImageData->SetExtent(inputImageData->GetExtent());
-    afterCannyImageData->SetSpacing(inputImageData->GetSpacing());
+    afterCannyImageData->SetOrigin(planeImageData->GetOrigin());
+    afterCannyImageData->SetExtent(planeImageData->GetExtent());
+    afterCannyImageData->SetSpacing(planeImageData->GetSpacing());
     afterCannyImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 
     vtkSmartPointer<vtkImageData> afterCannyAndFillImageData =
             vtkSmartPointer<vtkImageData>::New();
-    afterCannyAndFillImageData->SetOrigin(inputImageData->GetOrigin());
-    afterCannyAndFillImageData->SetExtent(inputImageData->GetExtent());
-    afterCannyAndFillImageData->SetSpacing(inputImageData->GetSpacing());
+    afterCannyAndFillImageData->SetOrigin(planeImageData->GetOrigin());
+    afterCannyAndFillImageData->SetExtent(planeImageData->GetExtent());
+    afterCannyAndFillImageData->SetSpacing(planeImageData->GetSpacing());
     afterCannyAndFillImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 
@@ -178,18 +194,40 @@ int main(int argc, char **argv) {
             vtkSmartPointer<vtkImageMathematics>::New();
 
 
-    planeBoundaryDetection(inputImageData,
-                           afterCannyImageData,
-                           afterCannyAndFillImageData,
-                           afterSub,
-                           CANNY_FILL_AND_SUB);
-
     vtkSmartPointer<vtkImageMathematics> multiply255 =
-        vtkSmartPointer<vtkImageMathematics>::New();
-    multiply255->SetInput1Data(afterSub->GetOutput());
-    multiply255->SetOperationToMultiplyByK();
-    multiply255->SetConstantK(255);
-    multiply255->Update();
+            vtkSmartPointer<vtkImageMathematics>::New();
+
+    vtkSmartPointer<vtkPNGWriter> writer =
+            vtkSmartPointer<vtkPNGWriter>::New();
+
+    int zIndexes[9] = {0, 49, 99, 149, 199, 249, 299, 349, 399};
+//    , 449, 499, 549, 599, 649, 699, 749, 799
+    for (int i = 0; i < 9; i++) {
+        // Extract plane from input 3d image data
+        tempPlaneExtent[4] = zIndexes[i];
+        tempPlaneExtent[5] = zIndexes[i];
+        tempPlanePointer = (float *) (input3DImageData->GetScalarPointerForExtent(tempPlaneExtent));
+
+        planeBoundaryDetection(tempPlanePointer,
+                               afterCannyImageData,
+                               afterCannyAndFillImageData,
+                               afterSub,
+                               CANNY_ONLY);
+
+        multiply255->SetInput1Data(afterCannyImageData);
+        multiply255->SetOperationToMultiplyByK();
+        multiply255->SetConstantK(255);
+        multiply255->Update();
+
+        std::string _filename;
+        _filename = "/Users/heliu/temp/node-centered/step3-3d/" + std::to_string(zIndexes[i]) + ".png";
+        writer->SetFileName(_filename.c_str());
+        writer->SetInputConnection(multiply255->GetOutputPort());
+        writer->Write();
+        cout << i << ".png" << "  has been written \n";
+    }
+
+
 //     Save file
 //    vtkSmartPointer<vtkMetaImageWriter> writer =
 //            vtkSmartPointer<vtkMetaImageWriter>::New();
@@ -198,11 +236,6 @@ int main(int argc, char **argv) {
 ////    writer->SetInputData(afterSub->GetOutput());
 //    writer->Write();
 
-    vtkSmartPointer<vtkPNGWriter> writer =
-        vtkSmartPointer<vtkPNGWriter>::New();
-    writer->SetFileName(argv[2]);
-    writer->SetInputConnection(multiply255->GetOutputPort());
-    writer->Write();
 
 
     return 0;
