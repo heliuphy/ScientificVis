@@ -1,4 +1,4 @@
-FILE(GLOB MAIN_SRC_FILE "*.cpp")
+#FILE(GLOB MAIN_SRC_FILE "*.cpp")
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Canny/include)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ImageFill/include)
@@ -7,7 +7,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/CannyAndFill/utils)
 LINK_LIBRARIES(${PROJECT_BINARY_DIR}/Canny)
 LINK_LIBRARIES(${PROJECT_BINARY_DIR}/ImageFill)
 
-ADD_EXECUTABLE(CannyAndFill ${MAIN_SRC_FILE} utils/HlwUtils.cpp)
+ADD_EXECUTABLE(CannyAndFill utils/HlwUtils.cpp main.cpp)
 TARGET_LINK_LIBRARIES(CannyAndFill myCanny imageFill)
 
 #ADD_EXECUTABLE(TestMatlabFillPointID TestMatlabFillPointID.cpp)
