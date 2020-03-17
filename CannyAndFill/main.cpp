@@ -15,11 +15,32 @@
 #include <vtkPNGWriter.h>
 #include <vtkMetaImageWriter.h>
 #include <vtkImageMathematics.h>
-#include "utils/HlwUtils.h"
+#include "HlwUtils.h"
 
 #define CANNY_ONLY 0
 #define CANNY_AND_FILL 1
 #define CANNY_FILL_AND_SUB 2
+
+void booleanTArraySub(const boolean_T *inputArray1,
+                      const boolean_T *inputArray2,
+                      boolean_T *outputArray,
+                      int xSize, int ySize) {
+    int squareSize = xSize * ySize;
+    for (int i = 0; i < squareSize; i++) {
+        outputArray[i] = inputArray1[i] - inputArray2[i];
+    }
+}
+
+void booleanTArrayMultiplyByK(const boolean_T *inputArray,
+                              boolean_T *outputArray,
+                              int k,
+                              int xSize, int ySize
+) {
+    int squareSize = xSize * ySize;
+    for (int i = 0; i < squareSize; i++) {
+        outputArray[i] = inputArray[i] * k;
+    }
+}
 
 void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *p2) {
     int planeExtent[6];
@@ -74,7 +95,7 @@ void
 planeBoundaryDetection(float *_inputImageDataPointer,
                        vtkImageData *_afterCannyImageData,
                        vtkImageData *_afterCannyAndFillImageData,
-                       vtkImageMathematics *_afterSub,
+                       vtkImageData *_afterSubImageData,
                        int _options) {
     bool _doCanny = false;
     bool _doFill = false;
@@ -83,6 +104,7 @@ planeBoundaryDetection(float *_inputImageDataPointer,
 
     auto _afterCannyImagePointer = (boolean_T *) (_afterCannyImageData->GetScalarPointer());
     auto _afterCannyAndFillImagePointer = (boolean_T *) (_afterCannyAndFillImageData->GetScalarPointer());
+    auto _afterSubImagePointer = (boolean_T *) (_afterSubImageData->GetScalarPointer());
 
     switch (_options) {
         case CANNY_ONLY:
@@ -126,10 +148,8 @@ planeBoundaryDetection(float *_inputImageDataPointer,
 
         if (_doSub) {
             // 计算两图之差
-            _afterSub->SetInput1Data(_afterCannyAndFillImageData);
-            _afterSub->SetInput2Data(_afterCannyImageData);
-            _afterSub->SetOperationToSubtract();
-            _afterSub->Update();
+            booleanTArraySub(_afterCannyAndFillImagePointer, _afterCannyImagePointer,
+                             _afterSubImagePointer, 800, 800);
         }
         // Clean
         ImageFill_terminate();
@@ -145,11 +165,13 @@ int main(int argc, char **argv) {
             vtkSmartPointer<vtkMetaImageReader>::New();
     reader->SetFileName(argv[1]);
     reader->Update();
+    reader->Print(cout);
 
     vtkSmartPointer<vtkMetaImageReader> planeReader =
             vtkSmartPointer<vtkMetaImageReader>::New();
     planeReader->SetFileName(argv[2]);
     planeReader->Update();
+    planeReader->Print(cout);
 
     vtkSmartPointer<vtkImageData> input3DImageData = reader->GetOutput();
     vtkSmartPointer<vtkImageData> planeImageData = planeReader->GetOutput();
@@ -180,6 +202,7 @@ int main(int argc, char **argv) {
     afterCannyImageData->SetExtent(planeImageData->GetExtent());
     afterCannyImageData->SetSpacing(planeImageData->GetSpacing());
     afterCannyImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+    afterCannyImageData->Print(cout);
 
 
     vtkSmartPointer<vtkImageData> afterCannyAndFillImageData =
@@ -188,14 +211,28 @@ int main(int argc, char **argv) {
     afterCannyAndFillImageData->SetExtent(planeImageData->GetExtent());
     afterCannyAndFillImageData->SetSpacing(planeImageData->GetSpacing());
     afterCannyAndFillImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+    afterCannyAndFillImageData->Print(cout);
+
+    vtkSmartPointer<vtkImageData> afterSubImageData =
+            vtkSmartPointer<vtkImageData>::New();
+    afterSubImageData->SetOrigin(planeImageData->GetOrigin());
+    afterSubImageData->SetExtent(planeImageData->GetExtent());
+    afterSubImageData->SetSpacing(planeImageData->GetSpacing());
+    afterSubImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+    afterSubImageData->Print(cout);
+
+    auto afterSubDataPointer = (boolean_T *)(afterSubImageData->GetScalarPointer());
 
 
-    vtkSmartPointer<vtkImageMathematics> afterSub =
-            vtkSmartPointer<vtkImageMathematics>::New();
+    vtkSmartPointer<vtkImageData> multiply255 =
+            vtkSmartPointer<vtkImageData>::New();
+    multiply255->SetOrigin(planeImageData->GetOrigin());
+    multiply255->SetExtent(planeImageData->GetExtent());
+    multiply255->SetSpacing(planeImageData->GetSpacing());
+    multiply255->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+    multiply255->Print(cout);
 
-
-    vtkSmartPointer<vtkImageMathematics> multiply255 =
-            vtkSmartPointer<vtkImageMathematics>::New();
+    auto multiply255DataPointer = (boolean_T *)(multiply255->GetScalarPointer());
 
     vtkSmartPointer<vtkPNGWriter> writer =
             vtkSmartPointer<vtkPNGWriter>::New();
@@ -211,19 +248,17 @@ int main(int argc, char **argv) {
         planeBoundaryDetection(tempPlanePointer,
                                afterCannyImageData,
                                afterCannyAndFillImageData,
-                               afterSub,
+                               afterSubImageData,
                                CANNY_ONLY);
 
-        multiply255->SetInput1Data(afterCannyImageData);
-        multiply255->SetOperationToMultiplyByK();
-        multiply255->SetConstantK(255);
-        multiply255->Update();
+        booleanTArrayMultiplyByK((boolean_T *)(afterCannyImageData->GetScalarPointer()), multiply255DataPointer, 255, 800, 800);
 
         std::string _filename;
         _filename = "/Users/heliu/temp/node-centered/step3-3d/" + std::to_string(zIndexes[i]) + ".png";
         writer->SetFileName(_filename.c_str());
-        writer->SetInputConnection(multiply255->GetOutputPort());
+        writer->SetInputData(multiply255);
         writer->Write();
+        writer->Print(cout);
         cout << i << ".png" << "  has been written \n";
     }
 

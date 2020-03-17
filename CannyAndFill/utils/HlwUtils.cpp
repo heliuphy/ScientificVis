@@ -5,8 +5,10 @@
 #include <string>
 #include <iostream>
 #include "HlwUtils.h"
+#include "rtwtypes.h"
 
 using std::string;
 using std::cout;
 using std::endl;
+
 
