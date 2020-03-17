@@ -5,7 +5,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include "rtwtypes.h"
-#include "ImageFill_types.h"
+#include "ImageFillOnlyOnePoint_types.h"
 
 // Function Declarations
 extern int main(int argc, const char *const argv[]);

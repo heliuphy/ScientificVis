@@ -28,7 +28,6 @@ using std::cout;
 using std::endl;
 
 
-
 void booleanTArraySub(const boolean_T *inputArray1,
                       const boolean_T *inputArray2,
                       boolean_T *outputArray,
@@ -61,8 +60,8 @@ void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *
     horizontalLineExtent[4] = planeExtent[4];
     horizontalLineExtent[5] = planeExtent[5];
 
-    printArray<int>(planeExtent, 6, "planeExtent");
-    printArray<int>(horizontalLineExtent, 6, "horizonExtent");
+//    printArray<int>(planeExtent, 6, "planeExtent");
+//    printArray<int>(horizontalLineExtent, 6, "horizonExtent");
 
     int thisPoint = 0;
     // 遇到的边界编号,从左往右应该遇到8次
@@ -80,6 +79,14 @@ void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *
         }
         pixel++;
     }
+    if (edgeNum < 4) {
+        cout << "haven't found 4 edges " << endl;
+    }
+
+    // Determine the position of the four points relative
+    // to the center point to determine whether it is on
+    // the left or right half.
+
     int _y = horizontalLineExtent[2];
     int _z = horizontalLineExtent[4];
     int ijk[3] = {0};
@@ -91,11 +98,15 @@ void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *
         pointIDs[i] = afterCannyImageData->ComputePointId(ijk);
     }
 
-    *p1 = (pointIDs[0] + pointIDs[1]) / 2;
-    *p2 = (pointIDs[2] + pointIDs[3]) / 2;
-
-    printArray<int>(edgeArray, 4, "edgeArray");
-    printArray<vtkIdType>(pointIDs, 4, "pointIDs");
+    if (edgeArray[0] < 399 && edgeArray[1] < 399 && edgeArray[2] < 399 && edgeArray[3] > 399) {
+        *p1 = (pointIDs[0] + pointIDs[1]) / 2;
+        *p2 = *p1;
+    } else {
+        *p1 = (pointIDs[0] + pointIDs[1]) / 2;
+        *p2 = (pointIDs[2] + pointIDs[3]) / 2;
+    }
+//    printArray<int>(edgeArray, 4, "edgeArray");
+//    printArray<vtkIdType>(pointIDs, 4, "pointIDs");
 
 }
 

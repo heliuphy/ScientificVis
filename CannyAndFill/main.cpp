@@ -15,13 +15,13 @@ int main(int argc, char **argv) {
             vtkSmartPointer<vtkMetaImageReader>::New();
     reader->SetFileName(argv[1]);
     reader->Update();
-    reader->Print(cout);
+//    reader->Print(cout);
 
     vtkSmartPointer<vtkMetaImageReader> planeReader =
             vtkSmartPointer<vtkMetaImageReader>::New();
     planeReader->SetFileName(argv[2]);
     planeReader->Update();
-    planeReader->Print(cout);
+//    planeReader->Print(cout);
 
     vtkSmartPointer<vtkImageData> input3DImageData = reader->GetOutput();
     vtkSmartPointer<vtkImageData> planeImageData = planeReader->GetOutput();
@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
     afterCannyImageData->SetExtent(planeImageData->GetExtent());
     afterCannyImageData->SetSpacing(planeImageData->GetSpacing());
     afterCannyImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-    afterCannyImageData->Print(cout);
+//    afterCannyImageData->Print(cout);
 
 
     vtkSmartPointer<vtkImageData> afterCannyAndFillImageData =
@@ -61,7 +61,7 @@ int main(int argc, char **argv) {
     afterCannyAndFillImageData->SetExtent(planeImageData->GetExtent());
     afterCannyAndFillImageData->SetSpacing(planeImageData->GetSpacing());
     afterCannyAndFillImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-    afterCannyAndFillImageData->Print(cout);
+//    afterCannyAndFillImageData->Print(cout);
 
     vtkSmartPointer<vtkImageData> afterSubImageData =
             vtkSmartPointer<vtkImageData>::New();
@@ -69,9 +69,9 @@ int main(int argc, char **argv) {
     afterSubImageData->SetExtent(planeImageData->GetExtent());
     afterSubImageData->SetSpacing(planeImageData->GetSpacing());
     afterSubImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-    afterSubImageData->Print(cout);
+//    afterSubImageData->Print(cout);
 
-    auto afterSubDataPointer = (boolean_T *)(afterSubImageData->GetScalarPointer());
+    auto afterSubDataPointer = (boolean_T *) (afterSubImageData->GetScalarPointer());
 
 
     vtkSmartPointer<vtkImageData> multiply255 =
@@ -80,16 +80,20 @@ int main(int argc, char **argv) {
     multiply255->SetExtent(planeImageData->GetExtent());
     multiply255->SetSpacing(planeImageData->GetSpacing());
     multiply255->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
-    multiply255->Print(cout);
+//    multiply255->Print(cout);
 
-    auto multiply255DataPointer = (boolean_T *)(multiply255->GetScalarPointer());
+    auto multiply255DataPointer = (boolean_T *) (multiply255->GetScalarPointer());
 
     vtkSmartPointer<vtkPNGWriter> writer =
             vtkSmartPointer<vtkPNGWriter>::New();
 
-    int zIndexes[9] = {0, 49, 99, 149, 199, 249, 299, 349, 399};
+    int zIndexes[100];
+    zIndexes[0] = 0;
+    for (int i = 1; i < 100; i++) {
+        zIndexes[i] = 399 - 4 * (i - 1);
+    }
 //    , 449, 499, 549, 599, 649, 699, 749, 799
-    for (int i = 0; i < 9; i++) {
+    for (int i = 0; i < 100; i++) {
         // Extract plane from input 3d image data
         tempPlaneExtent[4] = zIndexes[i];
         tempPlaneExtent[5] = zIndexes[i];
@@ -99,16 +103,17 @@ int main(int argc, char **argv) {
                                afterCannyImageData,
                                afterCannyAndFillImageData,
                                afterSubImageData,
-                               CANNY_ONLY);
+                               CANNY_FILL_AND_SUB);
 
-        booleanTArrayMultiplyByK((boolean_T *)(afterCannyImageData->GetScalarPointer()), multiply255DataPointer, 255, 800, 800);
+        booleanTArrayMultiplyByK((boolean_T *) (afterSubImageData->GetScalarPointer()), multiply255DataPointer, 255,
+                                 800, 800);
 
         std::string _filename;
         _filename = "/Users/heliu/temp/node-centered/step3-3d/" + std::to_string(zIndexes[i]) + ".png";
         writer->SetFileName(_filename.c_str());
         writer->SetInputData(multiply255);
         writer->Write();
-        writer->Print(cout);
+//        writer->Print(cout);
         cout << i << ".png" << "  has been written \n";
     }
 
