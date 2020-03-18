@@ -1,7 +1,7 @@
 // Include Files
 #include "rt_nonfinite.h"
 #include "ImageFillOnlyOnePoint.h"
-#include "main.h"
+#include "print100plane.h"
 #include "ImageFillOnlyOnePoint_terminate.h"
 #include "ImageFillOnlyOnePoint_initialize.h"
 #include <vtkSmartPointer.h>
