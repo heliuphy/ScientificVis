@@ -3,8 +3,6 @@
 //
 
 #include "HlwUtils.h"
-
-#include <string>
 #include <iostream>
 #include <vtkType.h>
 #include <vtkImageData.h>
@@ -16,12 +14,7 @@
 #include "CannyAutoThres_terminate.h"
 #include "CannyAutoThres_initialize.h"
 #include "rtwtypes.h"
-#include <vtkSmartPointer.h>
-#include <vtkImageData.h>
-#include <vtkMetaImageReader.h>
-#include <vtkPNGWriter.h>
-#include <vtkMetaImageWriter.h>
-#include <vtkImageMathematics.h>
+#include "ImageFillOnlyOnePoint.h"
 
 using std::string;
 using std::cout;
@@ -63,7 +56,6 @@ void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *
 //    printArray<int>(planeExtent, 6, "planeExtent");
 //    printArray<int>(horizontalLineExtent, 6, "horizonExtent");
 
-    int thisPoint = 0;
     // 遇到的边界编号,从左往右应该遇到8次
     int edgeNum = 0;
     int edgeArray[8] = {0};
@@ -163,7 +155,11 @@ planeBoundaryDetection(float *_inputImageDataPointer,
         cout << "p1 and p2 " << endl;
         cout << *p1 << " " << *p2 << endl;
 
-        ImageFill(_afterCannyImagePointer, *p1, *p2, _afterCannyAndFillImagePointer);
+        if (*p1 == *p2) {
+            ImageFillOnlyOnePoint(_afterCannyImagePointer, *p1, _afterCannyAndFillImagePointer);
+        } else {
+            ImageFill(_afterCannyImagePointer, *p1, *p2, _afterCannyAndFillImagePointer);
+        }
 
         if (_doSub) {
             // 计算两图之差

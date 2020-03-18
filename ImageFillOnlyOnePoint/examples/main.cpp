@@ -4,6 +4,11 @@
 #include "main.h"
 #include "ImageFillOnlyOnePoint_terminate.h"
 #include "ImageFillOnlyOnePoint_initialize.h"
+#include <vtkSmartPointer.h>
+#include <vtkImageData.h>
+#include <vtkMetaImageReader.h>
+#include <vtkPNGReader.h>
+#include <vtkPNGWriter.h>
 
 // Function Declarations
 static void argInit_800x800_boolean_T(boolean_T result[640000]);
@@ -77,7 +82,36 @@ int main(int, const char *const[]) {
 
     // Invoke the entry-point functions.
     // You can call entry-point functions multiple times.
-    main_ImageFillOnlyOnePoint();
+
+    vtkSmartPointer<vtkPNGReader> reader =
+            vtkSmartPointer<vtkPNGReader>::New();
+    reader->SetFileName("/Users/heliu/temp/node-centered/step3-3d/100-canny/127.png");
+    reader->Update();
+
+    vtkSmartPointer<vtkImageData> output =
+            vtkSmartPointer<vtkImageData>::New();
+    output->SetOrigin(0, 0, 0);
+    output->SetSpacing(5, 5, 5);
+    output->SetExtent(0, 799, 0, 799, 0, 0);
+    output->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+
+    auto inputPointer = (boolean_T *)(reader->GetOutput()->GetScalarPointer());
+    auto outputPointer = (boolean_T *)(output->GetScalarPointer());
+
+    double id = 500;
+
+    ImageFillOnlyOnePoint(inputPointer, id, outputPointer);
+
+    for (int j = 0; j < 640000; j++) {
+            *outputPointer = *outputPointer * 255;
+            outputPointer++;
+    }
+
+    vtkSmartPointer<vtkPNGWriter> writer =
+        vtkSmartPointer<vtkPNGWriter>::New();
+    writer->SetFileName("/Users/heliu/temp/node-centered/step3-3d/test/out.png");
+    writer->SetInputData(output);
+    writer->Write();
 
     // Terminate the application.
     // You do not need to do this more than one time.

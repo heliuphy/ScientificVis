@@ -6,5 +6,5 @@ TARGET_LINK_LIBRARIES(imageFillOnlyOnePoint ${SYS_LIBS_MATLAB_NEEDED} ${MATLAB_L
 # For Test
 INCLUDE_DIRECTORIES(EXAMPLES/MAIN.H)
 ADD_EXECUTABLE(ImageFillOnlyOnePoint_Test examples/main.cpp)
-TARGET_LINK_LIBRARIES(ImageFillOnlyOnePoint_Test imageFillOnlyOnePoint)
+TARGET_LINK_LIBRARIES(ImageFillOnlyOnePoint_Test imageFillOnlyOnePoint )
 
