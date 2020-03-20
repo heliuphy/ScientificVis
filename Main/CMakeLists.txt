@@ -1,8 +1,8 @@
 #FILE(GLOB MAIN_SRC_FILE "*.cpp")
 
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Canny/include)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Canny_Z/include)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ImageFill/include)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/CannyAndFill/utils)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Main/utils)
 
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/Canny)
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/ImageFill)
@@ -14,5 +14,8 @@ TARGET_LINK_LIBRARIES(print100Plane myCanny imageFill imageFillOnlyOnePoint)
 #ADD_EXECUTABLE(TestMatlabFillPointID TestMatlabFillPointID.cpp)
 #TARGET_LINK_LIBRARIES(TestMatlabFillPointID imageFill)
 
-ADD_EXECUTABLE(creat3dcanny utils/HlwUtils.cpp creat3dcanny.cpp)
-TARGET_LINK_LIBRARIES(creat3dcanny myCanny imageFill imageFillOnlyOnePoint)
+ADD_EXECUTABLE(EdgeDetectionResultsNormalZ utils/HlwUtils.cpp EdgeDetectionResultsNormalZ.cpp)
+TARGET_LINK_LIBRARIES(EdgeDetectionResultsNormalZ CannyZ imageFill imageFillOnlyOnePoint)
+
+ADD_EXECUTABLE(EdgeDetectionResultsNormalX utils/HlwUtils.cpp EdgeDetectionResultsNormalX.cpp)
+TARGET_LINK_LIBRARIES(EdgeDetectionResultsNormalX CannyX imageFill imageFillOnlyOnePoint)
