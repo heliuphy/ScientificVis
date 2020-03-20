@@ -19,3 +19,9 @@ TARGET_LINK_LIBRARIES(EdgeDetectionResultsNormalZ CannyZ imageFill imageFillOnly
 
 ADD_EXECUTABLE(EdgeDetectionResultsNormalX utils/HlwUtils.cpp EdgeDetectionResultsNormalX.cpp)
 TARGET_LINK_LIBRARIES(EdgeDetectionResultsNormalX CannyX imageFill imageFillOnlyOnePoint)
+
+ADD_EXECUTABLE(print100PlaneOOP utils/HlwUtils.cpp print100PlaneOOP.cpp)
+TARGET_LINK_LIBRARIES(print100PlaneOOP myCanny imageFill imageFillOnlyOnePoint)
+
+ADD_EXECUTABLE(Generate3DMaskDataOOP utils/HlwUtils.cpp Generate3DMaskDataOOP.cpp)
+TARGET_LINK_LIBRARIES(Generate3DMaskDataOOP CannyZ imageFill imageFillOnlyOnePoint)

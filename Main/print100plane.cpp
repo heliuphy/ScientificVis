@@ -1,6 +1,7 @@
 //
 // Created by 何柳 on 2020/3/14.
 //
+
 #include "ImageFill_types.h"
 #include "rtwtypes.h"
 #include <vtkSmartPointer.h>
@@ -8,18 +9,24 @@
 #include <vtkMetaImageReader.h>
 #include <vtkPNGWriter.h>
 #include "HlwUtils.h"
+#include <vector>
+
+using std::calloc;
+using std::cout;
+using std::endl;
+using std::vector;
 
 
 int main(int argc, char **argv) {
     vtkSmartPointer<vtkMetaImageReader> reader =
             vtkSmartPointer<vtkMetaImageReader>::New();
-    reader->SetFileName(argv[1]);
+    reader->SetFileName("/Users/heliu/temp/node-centered/Step1Reslice/volume800Meta.mhd");
     reader->Update();
 //    reader->Print(cout);
 
     vtkSmartPointer<vtkMetaImageReader> planeReader =
             vtkSmartPointer<vtkMetaImageReader>::New();
-    planeReader->SetFileName(argv[2]);
+    planeReader->SetFileName("/Users/heliu/temp/node-centered/Step1Reslice/output/plane.mhd");
     planeReader->Update();
 //    planeReader->Print(cout);
 
@@ -87,34 +94,53 @@ int main(int argc, char **argv) {
     vtkSmartPointer<vtkPNGWriter> writer =
             vtkSmartPointer<vtkPNGWriter>::New();
 
-    int zIndexes[100];
-    zIndexes[0] = 0;
-    for (int i = 1; i < 100; i++) {
-        zIndexes[i] = 399 - 4 * (i - 1);
+//    int zIndexes[PLANE_NUM];
+//    zIndexes[0] = 0;
+
+    int zStart = 0;
+    int zEnd = 50;
+    int planeSpacing = 1;
+
+    vector<int> zIndexes;
+    for (int i = zStart; i <= zEnd; i += planeSpacing) {
+        zIndexes.push_back(i);
     }
+
+//    for (int i = 1; i < PLANE_NUM; i++) {
+//        zIndexes[i] = 399 - 4 * (i - 1);
+//    }
 //    , 449, 499, 549, 599, 649, 699, 749, 799
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < zIndexes.size(); i++) {
         // Extract plane from input 3d image data
         tempPlaneExtent[4] = zIndexes[i];
         tempPlaneExtent[5] = zIndexes[i];
         tempPlanePointer = (float *) (input3DImageData->GetScalarPointerForExtent(tempPlaneExtent));
 
+//        planeBoundaryDetection(tempPlanePointer,
+//                               afterCannyImageData,
+//                               afterCannyAndFillImageData,
+//                               afterSubImageData,
+//                               CANNY_FILL_AND_SUB);
+
         planeBoundaryDetection(tempPlanePointer,
                                afterCannyImageData,
                                afterCannyAndFillImageData,
                                afterSubImageData,
-                               CANNY_FILL_AND_SUB);
+                               CANNY_ONLY);
 
-        booleanTArrayMultiplyByK((boolean_T *) (afterSubImageData->GetScalarPointer()), multiply255DataPointer, 255,
+//        booleanTArrayMultiplyByK((boolean_T *) (afterSubImageData->GetScalarPointer()), multiply255DataPointer, 255,
+//                                 800, 800);
+        booleanTArrayMultiplyByK((boolean_T *) (afterCannyImageData->GetScalarPointer()), multiply255DataPointer, 255,
                                  800, 800);
 
         std::string _filename;
-        _filename = "/Users/heliu/temp/node-centered/step3-3d/" + std::to_string(zIndexes[i]) + ".png";
+        _filename =
+                "/Users/heliu/temp/node-centered/step3-slice/zTopAndEndSlice/" + std::to_string(zIndexes[i]) + ".png";
         writer->SetFileName(_filename.c_str());
         writer->SetInputData(multiply255);
         writer->Write();
 //        writer->Print(cout);
-        cout << i << ".png" << "  has been written \n";
+        cout << zIndexes[i] << ".png" << "  has been written \n";
     }
 
     return 0;
