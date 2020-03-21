@@ -2,7 +2,7 @@
 // File: ImageFill_initialize.cpp
 //
 // MATLAB Coder version            : 3.3
-// C/C++ source code generated on  : 12-Mar-2020 16:36:47
+// C/C++ source code generated on  : 21-Mar-2020 11:42:13
 //
 
 // Include Files
@@ -16,8 +16,9 @@
 // Arguments    : void
 // Return Type  : void
 //
-void ImageFill_initialize() {
-    rt_InitInfAndNaN(8U);
+void ImageFill_initialize()
+{
+  rt_InitInfAndNaN(8U);
 }
 
 //

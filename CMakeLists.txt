@@ -18,9 +18,6 @@ ELSE (VTK_FOUND)
     MESSAGE("VTK not found...nothing will be built.")
 ENDIF (VTK_FOUND)
 
-# 设置本项目头文件
-SET(HLW_INCLUDES ${PROJECT_SOURCE_DIR}/include)
-INCLUDE_DIRECTORIES(${HLW_INCLUDES})
 
 # 设置 vtk matlab 头文件
 INCLUDE(${VTK_USE_FILE})
@@ -39,11 +36,13 @@ MESSAGE("matlab include dir is " ${MATLAB_INCLUDE_DIRS})
 
 # 增加子目录
 # 用来编译库
-ADD_SUBDIRECTORY(Canny_Z)
-ADD_SUBDIRECTORY(Canny_X)
-ADD_SUBDIRECTORY(CannyWithoutSpaceLimit)
+
+ADD_SUBDIRECTORY(Canny)
 ADD_SUBDIRECTORY(ImageFill)
-ADD_SUBDIRECTORY(ImageFill_X)
-ADD_SUBDIRECTORY(ImageFillOnlyOnePoint)
+
+
+# 增加子目录
+# 用来编译可执行文件
 ADD_SUBDIRECTORY(Main)
+
 
