@@ -16,11 +16,16 @@
 
 // Function Declarations
 extern void emxEnsureCapacity(emxArray__common *emxArray, int oldNumel, unsigned
-  int elementSize);
+int elementSize);
+
 extern void emxFree_boolean_T(emxArray_boolean_T **pEmxArray);
+
 extern void emxFree_real_T(emxArray_real_T **pEmxArray);
+
 extern void emxInit_boolean_T(emxArray_boolean_T **pEmxArray, int numDimensions);
+
 extern void emxInit_boolean_T1(emxArray_boolean_T **pEmxArray, int numDimensions);
+
 extern void emxInit_real_T(emxArray_real_T **pEmxArray, int numDimensions);
 
 #endif

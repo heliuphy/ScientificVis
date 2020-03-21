@@ -16,9 +16,8 @@
 // Arguments    : void
 // Return Type  : void
 //
-void ImageFill_terminate()
-{
-  // (no terminate code required)
+void ImageFill_terminate() {
+    // (no terminate code required)
 }
 
 //

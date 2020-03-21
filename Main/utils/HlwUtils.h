@@ -18,9 +18,9 @@
 #include "ImageFill.h"
 #include "ImageFill_terminate.h"
 #include "ImageFill_initialize.h"
-#include "CannyAutoThres.h"
-#include "CannyAutoThres_terminate.h"
-#include "CannyAutoThres_initialize.h"
+#include "Canny.h"
+#include "Canny_terminate.h"
+#include "Canny_initialize.h"
 #include "rtwtypes.h"
 #include <vtkSmartPointer.h>
 #include <vtkImageData.h>

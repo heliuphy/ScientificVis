@@ -17,3 +17,6 @@ TARGET_LINK_LIBRARIES(print100PlaneOOP hlwCanny hlwImageFill)
 
 ADD_EXECUTABLE(Generate3DMaskDataOOP utils/HlwUtils.cpp Generate3DMaskDataOOP.cpp)
 TARGET_LINK_LIBRARIES(Generate3DMaskDataOOP hlwCanny hlwImageFill)
+
+ADD_EXECUTABLE(InfArrayEg utils/HlwUtils.cpp InfArrayEg.cpp)
+TARGET_LINK_LIBRARIES(InfArrayEg hlwCanny hlwImageFill)

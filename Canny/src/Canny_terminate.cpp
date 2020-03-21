@@ -16,9 +16,8 @@
 // Arguments    : void
 // Return Type  : void
 //
-void Canny_terminate()
-{
-  // (no terminate code required)
+void Canny_terminate() {
+    // (no terminate code required)
 }
 
 //

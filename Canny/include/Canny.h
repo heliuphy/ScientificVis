@@ -18,7 +18,7 @@
 
 // Function Declarations
 extern void Canny(const emxArray_real32_T *inputImage, emxArray_boolean_T
-                  *outputImage);
+*outputImage);
 
 #endif
 

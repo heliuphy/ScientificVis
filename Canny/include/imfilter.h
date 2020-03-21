@@ -18,7 +18,9 @@
 
 // Function Declarations
 extern void b_imfilter(emxArray_real32_T *varargin_1, const double varargin_2[13]);
+
 extern void imfilter(emxArray_real32_T *varargin_1);
+
 extern void padImage(const emxArray_real32_T *a_tmp, const double pad[2],
                      emxArray_real32_T *a);
 

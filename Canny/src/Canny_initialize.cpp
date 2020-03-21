@@ -16,8 +16,7 @@
 // Arguments    : void
 // Return Type  : void
 //
-void Canny_initialize()
-{
+void Canny_initialize() {
   rt_InitInfAndNaN(8U);
 }
 

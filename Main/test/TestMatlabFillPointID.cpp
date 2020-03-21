@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
 
 
     vtkSmartPointer<vtkMetaImageWriter> writer =
-        vtkSmartPointer<vtkMetaImageWriter>::New();
+            vtkSmartPointer<vtkMetaImageWriter>::New();
     writer->SetFileName(argv[2]);
     writer->SetInputData(outputImage);
     writer->Write();

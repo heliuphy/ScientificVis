@@ -18,7 +18,7 @@
 
 // Function Declarations
 extern void imfill(emxArray_boolean_T *varargin_1, const emxArray_real_T
-                   *varargin_2);
+*varargin_2);
 
 #endif
 

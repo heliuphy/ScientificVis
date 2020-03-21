@@ -16,9 +16,8 @@
 // Arguments    : void
 // Return Type  : void
 //
-void ImageFill_initialize()
-{
-  rt_InitInfAndNaN(8U);
+void ImageFill_initialize() {
+    rt_InitInfAndNaN(8U);
 }
 
 //

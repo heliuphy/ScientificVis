@@ -140,7 +140,7 @@ planeBoundaryDetection(float *_inputImageDataPointer,
     Canny_initialize();
 
 
-    // Canny_Z Edge Detection
+    // Canny Edge Detection
     CannyAutoThres(_inputImageDataPointer, _afterCannyImagePointer);
 
     if (_doFill) {

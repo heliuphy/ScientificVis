@@ -18,7 +18,7 @@
 
 // Function Declarations
 extern void bwselect(const emxArray_boolean_T *varargin_1, const emxArray_real_T
-                     *varargin_2, const emxArray_real_T *varargin_3,
+*varargin_2, const emxArray_real_T *varargin_3,
                      emxArray_boolean_T *varargout_1);
 
 #endif

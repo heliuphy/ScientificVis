@@ -25,13 +25,13 @@ struct ImageOriginSpacingExtent {
     int Extent[6];
 };
 
-class Generate3DMaskData {
+class AlgoBase {
 public:
-    Generate3DMaskData(int zStart,
-                       int zEnd,
-                       int planeSpacing,
-                       vtkImageData *_input2dImageData,
-                       vtkImageData *_input3dImageData)
+    AlgoBase(int zStart,
+             int zEnd,
+             int planeSpacing,
+             vtkImageData *_input2dImageData,
+             vtkImageData *_input3dImageData)
             :
             zStart(zStart), zEnd(zEnd), planeSpacing(planeSpacing) {
 
@@ -75,7 +75,7 @@ public:
             memcpy(tempFloat2dImagePointer, tempPlanePointer, 640000 * sizeof(float));
 
             vtkSmartPointer<vtkImageMapToColors> colorMap2 =
-                vtkSmartPointer<vtkImageMapToColors>::New();
+                    vtkSmartPointer<vtkImageMapToColors>::New();
             colorMap2->SetLookupTable(this->colorTable);
             colorMap2->SetInputData(tempFloat2dImage);
             colorMap2->Update();
@@ -160,7 +160,7 @@ public:
     }
 
     void setZStart(int zStart) {
-        Generate3DMaskData::zStart = zStart;
+        AlgoBase::zStart = zStart;
     }
 
     int getZEnd() const {
@@ -168,7 +168,7 @@ public:
     }
 
     void setZEnd(int zEnd) {
-        Generate3DMaskData::zEnd = zEnd;
+        AlgoBase::zEnd = zEnd;
     }
 
     int getPlaneSpacing() const {
@@ -176,7 +176,7 @@ public:
     }
 
     void setPlaneSpacing(int planeSpacing) {
-        Generate3DMaskData::planeSpacing = planeSpacing;
+        AlgoBase::planeSpacing = planeSpacing;
     }
 
     vtkImageData *getDim3InputData() const {
@@ -244,7 +244,7 @@ public:
     }
 
     void setMultiply255(vtkImageData *_multiply255) {
-        Generate3DMaskData::multiply255 = _multiply255;
+        AlgoBase::multiply255 = _multiply255;
         multiply255->SetOrigin(input2dImageInfo->Origin);
         multiply255->SetExtent(input2dImageInfo->Extent);
         multiply255->SetSpacing(input2dImageInfo->Spacing);
@@ -268,7 +268,7 @@ public:
     }
 
     void setWriter(vtkPNGWriter *_writer) {
-        Generate3DMaskData::writer = _writer;
+        AlgoBase::writer = _writer;
     }
 
     vtkLookupTable *getColorTable() const {
@@ -323,11 +323,11 @@ int main() {
     int zEnd = 20;
     int planeSpacing = 1;
 
-    Generate3DMaskData printP(zStart,
-                              zEnd,
-                              planeSpacing,
-                              planeReader->GetOutput(),
-                              reader->GetOutput());
+    AlgoBase printP(zStart,
+                    zEnd,
+                    planeSpacing,
+                    planeReader->GetOutput(),
+                    reader->GetOutput());
 
     vtkSmartPointer<vtkImageData> afterCannyImageData =
             vtkSmartPointer<vtkImageData>::New();

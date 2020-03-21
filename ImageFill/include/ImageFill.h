@@ -16,7 +16,7 @@
 
 // Function Declarations
 extern void ImageFill(const emxArray_boolean_T *inputImage, const
-                      emxArray_real_T *pointIDs, emxArray_boolean_T *outputImage);
+emxArray_real_T *pointIDs, emxArray_boolean_T *outputImage);
 
 #endif
 

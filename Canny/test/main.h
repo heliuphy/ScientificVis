@@ -42,7 +42,7 @@
 #include "Canny_types.h"
 
 // Function Declarations
-extern int main(int argc, const char * const argv[]);
+extern int main(int argc, const char *const argv[]);
 
 #endif
 

@@ -39,10 +39,11 @@ MESSAGE("matlab include dir is " ${MATLAB_INCLUDE_DIRS})
 
 ADD_SUBDIRECTORY(Canny)
 ADD_SUBDIRECTORY(ImageFill)
+ADD_SUBDIRECTORY(AlgoBase)
 
 
 # 增加子目录
 # 用来编译可执行文件
 ADD_SUBDIRECTORY(Main)
-
+ADD_SUBDIRECTORY(OOP)
 

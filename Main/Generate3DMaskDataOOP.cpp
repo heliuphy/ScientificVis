@@ -22,13 +22,13 @@ struct ImageOriginSpacingExtent {
     int Extent[6];
 };
 
-class Generate3DMaskData {
+class AlgoBase {
 public:
-    Generate3DMaskData(int zStart,
-                       int zEnd,
-                       int planeSpacing,
-                       vtkImageData *_input2dImageData,
-                       vtkImageData *_input3dImageData)
+    AlgoBase(int zStart,
+             int zEnd,
+             int planeSpacing,
+             vtkImageData *_input2dImageData,
+             vtkImageData *_input3dImageData)
             :
             zStart(zStart), zEnd(zEnd), planeSpacing(planeSpacing) {
 
@@ -159,7 +159,7 @@ public:
     }
 
     void setZStart(int zStart) {
-        Generate3DMaskData::zStart = zStart;
+        AlgoBase::zStart = zStart;
     }
 
     int getZEnd() const {
@@ -167,7 +167,7 @@ public:
     }
 
     void setZEnd(int zEnd) {
-        Generate3DMaskData::zEnd = zEnd;
+        AlgoBase::zEnd = zEnd;
     }
 
     int getPlaneSpacing() const {
@@ -175,7 +175,7 @@ public:
     }
 
     void setPlaneSpacing(int planeSpacing) {
-        Generate3DMaskData::planeSpacing = planeSpacing;
+        AlgoBase::planeSpacing = planeSpacing;
     }
 
     vtkImageData *getDim3InputData() const {
@@ -243,7 +243,7 @@ public:
     }
 
     void setMultiply255(vtkImageData *_multiply255) {
-        Generate3DMaskData::multiply255 = _multiply255;
+        AlgoBase::multiply255 = _multiply255;
         multiply255->SetOrigin(input2dImageInfo->Origin);
         multiply255->SetExtent(input2dImageInfo->Extent);
         multiply255->SetSpacing(input2dImageInfo->Spacing);
@@ -263,7 +263,7 @@ public:
     }
 
     void setWriter(vtkMetaImageWriter *_writer) {
-        Generate3DMaskData::writer = _writer;
+        AlgoBase::writer = _writer;
     }
 
     vtkLookupTable *getColorTable() const {
@@ -312,7 +312,7 @@ private:
     vtkLookupTable *colorTable;
 };
 
-void Generate3DMaskData::generate3D() {
+void AlgoBase::generate3D() {
 
     for (int i = 0; i < zIndexes.size(); i++) {
         // Extract plane from input 3d image data
@@ -360,11 +360,11 @@ int main() {
     int zEnd = 399;
     int planeSpacing = 1;
 
-    Generate3DMaskData generate3DMaskData(zStart,
-                                          zEnd,
-                                          planeSpacing,
-                                          planeReader->GetOutput(),
-                                          reader->GetOutput());
+    AlgoBase generate3DMaskData(zStart,
+                                zEnd,
+                                planeSpacing,
+                                planeReader->GetOutput(),
+                                reader->GetOutput());
 
     vtkSmartPointer<vtkImageData> afterCannyImageData =
             vtkSmartPointer<vtkImageData>::New();

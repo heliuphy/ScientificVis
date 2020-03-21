@@ -18,8 +18,8 @@
 
 // Function Declarations
 extern void thinAndThreshold(emxArray_boolean_T *E, const emxArray_real32_T *dx,
-  const emxArray_real32_T *dy, const emxArray_real32_T *magGrad, const double
-  lowThresh_data[], const double highThresh_data[], emxArray_boolean_T *H);
+                             const emxArray_real32_T *dy, const emxArray_real32_T *magGrad, const double
+                             lowThresh_data[], const double highThresh_data[], emxArray_boolean_T *H);
 
 #endif
 

@@ -16,8 +16,7 @@
 // Arguments    : void
 // Return Type  : void
 //
-void b_round()
-{
+void b_round() {
 }
 
 //
