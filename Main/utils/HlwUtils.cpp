@@ -10,11 +10,10 @@
 #include "ImageFill.h"
 #include "ImageFill_terminate.h"
 #include "ImageFill_initialize.h"
-#include "CannyAutoThres.h"
-#include "CannyAutoThres_terminate.h"
-#include "CannyAutoThres_initialize.h"
+#include "Canny.h"
+#include "Canny_terminate.h"
+#include "Canny_initialize.h"
 #include "rtwtypes.h"
-#include "ImageFillOnlyOnePoint.h"
 
 using std::string;
 using std::cout;
@@ -138,7 +137,7 @@ planeBoundaryDetection(float *_inputImageDataPointer,
     // Always Do Canny_Z
 
     // Initialize
-    CannyAutoThres_initialize();
+    Canny_initialize();
 
 
     // Canny_Z Edge Detection
@@ -171,7 +170,7 @@ planeBoundaryDetection(float *_inputImageDataPointer,
     }
 
     // Clean
-    CannyAutoThres_terminate();
+    Canny_terminate();
 
 }
 
