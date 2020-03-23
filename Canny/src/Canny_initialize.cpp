@@ -17,7 +17,7 @@
 // Return Type  : void
 //
 void Canny_initialize() {
-  rt_InitInfAndNaN(8U);
+    rt_InitInfAndNaN(8U);
 }
 
 //

@@ -101,77 +101,77 @@ void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *
 
 }
 
-void
-planeBoundaryDetection(float *_inputImageDataPointer,
-                       vtkImageData *_afterCannyImageData,
-                       vtkImageData *_afterCannyAndFillImageData,
-                       vtkImageData *_afterSubImageData,
-                       int _options) {
-    bool _doCanny = false;
-    bool _doFill = false;
-    bool _doSub = false;
-
-
-    auto _afterCannyImagePointer = (boolean_T *) (_afterCannyImageData->GetScalarPointer());
-    auto _afterCannyAndFillImagePointer = (boolean_T *) (_afterCannyAndFillImageData->GetScalarPointer());
-    auto _afterSubImagePointer = (boolean_T *) (_afterSubImageData->GetScalarPointer());
-
-    switch (_options) {
-        case CANNY_ONLY:
-            _doCanny = true;
-            break;
-        case CANNY_AND_FILL:
-            _doCanny = true;
-            _doFill = true;
-            break;
-        case CANNY_FILL_AND_SUB:
-            _doCanny = true;
-            _doFill = true;
-            _doSub = true;
-            break;
-        default:
-            cout << "planeBoundaryDetection option err !" << endl;
-            return;
-    }
-
-    // Always Do Canny_Z
-
-    // Initialize
-    Canny_initialize();
-
-
-    // Canny Edge Detection
-    CannyAutoThres(_inputImageDataPointer, _afterCannyImagePointer);
-
-    if (_doFill) {
-        ImageFill_initialize();
-        // Fill
-        double *p1 = (double *) malloc(sizeof(double));
-        double *p2 = (double *) malloc(sizeof(double));
-
-        findPointIDToImfill(_afterCannyImageData, p1, p2);
-
-        cout << "p1 and p2 " << endl;
-        cout << *p1 << " " << *p2 << endl;
-
-        if (*p1 == *p2) {
-            ImageFillOnlyOnePoint(_afterCannyImagePointer, *p1, _afterCannyAndFillImagePointer);
-        } else {
-            ImageFill(_afterCannyImagePointer, *p1, *p2, _afterCannyAndFillImagePointer);
-        }
-
-        if (_doSub) {
-            // 计算两图之差
-            booleanTArraySub(_afterCannyAndFillImagePointer, _afterCannyImagePointer,
-                             _afterSubImagePointer, 800, 800);
-        }
-        // Clean
-        ImageFill_terminate();
-    }
-
-    // Clean
-    Canny_terminate();
-
-}
-
-
+//void
+//planeBoundaryDetection(float *_inputImageDataPointer,
+//                       vtkImageData *_afterCannyImageData,
+//                       vtkImageData *_afterCannyAndFillImageData,
+//                       vtkImageData *_afterSubImageData,
+//                       int _options) {
+//    bool _doCanny = false;
+//    bool _doFill = false;
+//    bool _doSub = false;
+//
+//
+//    auto _afterCannyImagePointer = (boolean_T *) (_afterCannyImageData->GetScalarPointer());
+//    auto _afterCannyAndFillImagePointer = (boolean_T *) (_afterCannyAndFillImageData->GetScalarPointer());
+//    auto _afterSubImagePointer = (boolean_T *) (_afterSubImageData->GetScalarPointer());
+//
+//    switch (_options) {
+//        case CANNY_ONLY:
+//            _doCanny = true;
+//            break;
+//        case CANNY_AND_FILL:
+//            _doCanny = true;
+//            _doFill = true;
+//            break;
+//        case CANNY_FILL_AND_SUB:
+//            _doCanny = true;
+//            _doFill = true;
+//            _doSub = true;
+//            break;
+//        default:
+//            cout << "planeBoundaryDetection option err !" << endl;
+//            return;
+//    }
+//
+//    // Always Do Canny_Z
+//
+//    // Initialize
+//    Canny_initialize();
+//
+//
+//    // Canny Edge Detection
+//    CannyAutoThres(_inputImageDataPointer, _afterCannyImagePointer);
+//
+//    if (_doFill) {
+//        ImageFill_initialize();
+//        // Fill
+//        double *p1 = (double *) malloc(sizeof(double));
+//        double *p2 = (double *) malloc(sizeof(double));
+//
+//        findPointIDToImfill(_afterCannyImageData, p1, p2);
+//
+//        cout << "p1 and p2 " << endl;
+//        cout << *p1 << " " << *p2 << endl;
+//
+//        if (*p1 == *p2) {
+//            ImageFillOnlyOnePoint(_afterCannyImagePointer, *p1, _afterCannyAndFillImagePointer);
+//        } else {
+//            ImageFill(_afterCannyImagePointer, *p1, *p2, _afterCannyAndFillImagePointer);
+//        }
+//
+//        if (_doSub) {
+//            // 计算两图之差
+//            booleanTArraySub(_afterCannyAndFillImagePointer, _afterCannyImagePointer,
+//                             _afterSubImagePointer, 800, 800);
+//        }
+//        // Clean
+//        ImageFill_terminate();
+//    }
+//
+//    // Clean
+//    Canny_terminate();
+//
+//}
+//
+//

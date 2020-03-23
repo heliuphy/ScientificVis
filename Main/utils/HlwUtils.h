@@ -63,12 +63,12 @@ void booleanTArrayMultiplyByK(const boolean_T *inputArray,
 
 void findPointIDToImfill(vtkImageData *afterCannyImageData, double *p1, double *p2);
 
-void
-planeBoundaryDetection(float *_inputImageDataPointer,
-                       vtkImageData *_afterCannyImageData,
-                       vtkImageData *_afterCannyAndFillImageData,
-                       vtkImageData *_afterSubImageData,
-                       int _options);
+//void
+//planeBoundaryDetection(float *_inputImageDataPointer,
+//                       vtkImageData *_afterCannyImageData,
+//                       vtkImageData *_afterCannyAndFillImageData,
+//                       vtkImageData *_afterSubImageData,
+//                       int _options);
 
 
 #endif //MYPROJ_HLWUTILS_H

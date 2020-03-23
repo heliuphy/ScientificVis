@@ -35,28 +35,43 @@ public:
              vtkImageData *_input3dImageData);
 
 public:
+    void cannyDetect();
+
+    void findPointIDToImfill(double *p1, double *p2);
+
+    void doImageFill(real_T _p1, real_T _p2);
+
+    void twoImagesSub(vtkImageData *_imageData1, vtkImageData *_imageData2, vtkImageData *_resultImageData);
+
+    void booleanImageMultiplyByK(vtkImageData *_inputImageData, vtkImageData *_outputImageData, int k);
+
+    void findRealEdge();
+
+public:
+    void setToCannyImageData(vtkImageData *_toCannyImageData);
+
     int getZStart() const {
         return zStart;
     }
 
-    void setZStart(int zStart) {
-        AlgoBase::zStart = zStart;
+    void setZStart(int _zStart) {
+        AlgoBase::zStart = _zStart;
     }
 
     int getZEnd() const {
         return zEnd;
     }
 
-    void setZEnd(int zEnd) {
-        AlgoBase::zEnd = zEnd;
+    void setZEnd(int _zEnd) {
+        AlgoBase::zEnd = _zEnd;
     }
 
     int getPlaneSpacing() const {
         return planeSpacing;
     }
 
-    void setPlaneSpacing(int planeSpacing) {
-        AlgoBase::planeSpacing = planeSpacing;
+    void setPlaneSpacing(int _planeSpacing) {
+        AlgoBase::planeSpacing = _planeSpacing;
     }
 
     vtkImageData *getDim3InputData() const {
@@ -129,6 +144,11 @@ public:
 
     void setOutput3DEdgeData(vtkImageData *_output3DEdgeData);
 
+    void setToCannyEmxArray(emxArray_real32_T *_toCannyEmxArray);
+
+    void setAfterCannyEmxArray(emxArray_boolean_T *_afterCannyEmxArray);
+
+
 protected:
     int zStart;
     int zEnd;
@@ -139,6 +159,7 @@ protected:
     vector<int> zIndexes;
     vtkImageData *dim3InputData;
     vtkImageData *dim2InputData;
+    vtkImageData *toCannyImageData;
     vtkImageData *afterCannyImageData;
     vtkImageData *afterFillImageData;
     vtkImageData *afterSubImageData;
@@ -150,6 +171,11 @@ protected:
     ImageOriginSpacingExtent *tempPlaneInfo;
     vtkMetaImageWriter *writer;
     vtkLookupTable *colorTable;
+    emxArray_real32_T *toCannyEmxArray;
+    emxArray_boolean_T *afterCannyEmxArray;
+    emxArray_boolean_T *afterFillEmxArray;
+    emxArray_real_T *pointIDsToFillEmxArray;
+
 };
 
 

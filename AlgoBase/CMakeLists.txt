@@ -10,4 +10,5 @@ ADD_LIBRARY(AlgoBase AlgoBase.cpp)
 TARGET_LINK_LIBRARIES(AlgoBase hlwCanny hlwImageFill)
 
 
-
+ADD_EXECUTABLE(AlgoBaseTest ./test/AlgoBaseTest.cpp)
+TARGET_LINK_LIBRARIES(AlgoBaseTest AlgoBase)

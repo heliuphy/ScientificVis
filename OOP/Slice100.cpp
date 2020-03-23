@@ -24,7 +24,7 @@ void Slice100::printOriginalSlice() {
         auto tempFloat2dImagePointer = (float *) (tempFloat2dImage->GetScalarPointer());
         memcpy(tempFloat2dImagePointer, tempPlanePointer, 640000 * sizeof(float));
 
-        vtkSmartPointer<vtkImageMapToColors> colorMap2 =
+        vtkSmartPointer <vtkImageMapToColors> colorMap2 =
                 vtkSmartPointer<vtkImageMapToColors>::New();
         colorMap2->SetLookupTable(this->colorTable);
         colorMap2->SetInputData(tempFloat2dImage);
