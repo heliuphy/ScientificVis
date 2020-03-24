@@ -3,3 +3,10 @@
 //
 
 #include "hlwVolumeAlgorithms.h"
+
+hlwVolumeAlgorithms::hlwVolumeAlgorithms() {}
+
+hlwVolumeAlgorithms::~hlwVolumeAlgorithms() {
+
+}
+

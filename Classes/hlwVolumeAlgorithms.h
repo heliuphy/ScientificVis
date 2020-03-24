@@ -9,6 +9,12 @@
 
 class hlwVolumeAlgorithms :public hlwAlgorithms{
 
+public:
+
+    virtual ~hlwVolumeAlgorithms();
+
+    hlwVolumeAlgorithms();
+
 };
 
 

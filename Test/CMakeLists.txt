@@ -1,13 +1,23 @@
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Canny/include)
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/ImageFill/include)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Main/utils)
-INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/AlgoBase)
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Classes)
 
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/Canny)
 LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/ImageFill)
+LINK_DIRECTORIES(${PROJECT_BINARY_DIR}/Classes)
 
-SET(CLASSES_NEEDED_LIBS hlwCanny hlwImageFill AlgoBase hlwAlgorithms hlwPlaneAlgoritms PlaneNeighborGrowing CannyDetect
-        hlwImageFillh hlwImageMath)
+SET(CLASSES_NEEDED_LIBS
+        Canny
+        ImageFill
+        hlwAlgorithms
+        hlwPlaneAlgorithms
+        hlwVolumeAlgorithms
+        PlaneNeighborGrowing
+        CannyDetect
+        hlwImageFill
+        hlwImageMath
+        hlwImageSlice)
+
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Classes)
 
@@ -24,3 +34,6 @@ TARGET_LINK_LIBRARIES(hlwImageFillTest ${CLASSES_NEEDED_LIBS})
 
 ADD_EXECUTABLE(hlwImageMathTest hlwImageMathTest.cpp)
 TARGET_LINK_LIBRARIES(hlwImageMathTest ${CLASSES_NEEDED_LIBS})
+
+ADD_EXECUTABLE(hlwImageSliceTest hlwImageSliceTest.cpp)
+TARGET_LINK_LIBRARIES(hlwImageSliceTest ${CLASSES_NEEDED_LIBS})
