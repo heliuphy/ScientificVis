@@ -35,7 +35,7 @@ public:
              vtkImageData *_input3dImageData);
 
 public:
-    void cannyDetect();
+    void doCanny();
 
     void findPointIDToImfill(double *p1, double *p2);
 
@@ -45,7 +45,11 @@ public:
 
     void booleanImageMultiplyByK(vtkImageData *_inputImageData, vtkImageData *_outputImageData, int k);
 
+    void doImageFillAuto();
+
     void findRealEdge();
+
+    void generateOneSliceSaveToTempFloat2d(int _zIndex);
 
 public:
     void setToCannyImageData(vtkImageData *_toCannyImageData);

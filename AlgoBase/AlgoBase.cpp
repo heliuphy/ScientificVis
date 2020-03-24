@@ -126,7 +126,7 @@ void AlgoBase::setAfterCannyEmxArray(emxArray_boolean_T *_afterCannyEmxArray) {
     afterCannyEmxArray = _afterCannyEmxArray;
 }
 
-void AlgoBase::cannyDetect() {
+void AlgoBase::doCanny() {
 
     float *toCannyDataPointer = (float *) (toCannyImageData->GetScalarPointer());
 
@@ -265,6 +265,12 @@ void AlgoBase::doImageFill(real_T _p1, real_T _p2) {
     free(array1Points);
 }
 
+void AlgoBase::doImageFillAuto() {
+    real_T _pId[2];
+    findPointIDToImfill(_pId, _pId + 1);
+    doImageFill(_pId[0], _pId[1]);
+}
+
 void AlgoBase::twoImagesSub(vtkImageData *_imageData1, vtkImageData *_imageData2, vtkImageData *_resultImageData) {
 
 
@@ -302,5 +308,22 @@ void AlgoBase::setToCannyImageData(vtkImageData *_toCannyImageData) {
     AlgoBase::toCannyImageData = _toCannyImageData;
 }
 
+void AlgoBase::generateOneSliceSaveToTempFloat2d(int _zIndex) {
+    // Extract plane from input 3d image data
+    tempPlaneInfo->Extent[4] = _zIndex;
+    tempPlaneInfo->Extent[5] = _zIndex;
+    tempPlanePointer = (float *) (dim3InputData->GetScalarPointerForExtent(tempPlaneInfo->Extent));
+
+    int _dims[3];
+    tempFloat2dImage->GetDimensions(_dims);
+    std::sort(std::begin(_dims), std::end(_dims));
+    assert(_dims[0] == 1);
+
+    int _n = _dims[1] * _dims[2];
+
+    auto tempFloat2dImagePointer = (float *) (tempFloat2dImage->GetScalarPointer());
+    memcpy(tempFloat2dImagePointer, tempPlanePointer, _n * sizeof(float));
+
+}
 
 

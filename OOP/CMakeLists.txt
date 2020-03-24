@@ -17,3 +17,5 @@ TARGET_LINK_LIBRARIES(Slice100 ${OOP_NEEDED_LIBS})
 ADD_EXECUTABLE(Generate3d Generate3d.cpp)
 TARGET_LINK_LIBRARIES(Generate3d ${OOP_NEEDED_LIBS})
 
+ADD_EXECUTABLE(GenerateSpecificPlane GenerateMultipleSlices.cpp)
+TARGET_LINK_LIBRARIES(GenerateSpecificPlane ${OOP_NEEDED_LIBS})

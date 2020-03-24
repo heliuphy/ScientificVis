@@ -49,7 +49,7 @@ int main() {
             vtkSmartPointer<vtkImageData>::New();
     algoBase.setMultiply255(multiply255);
 
-    algoBase.cannyDetect();
+    algoBase.doCanny();
 
     double pID[2] = {0};
     algoBase.findPointIDToImfill(pID, pID + 1);
