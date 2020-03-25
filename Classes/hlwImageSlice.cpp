@@ -46,3 +46,9 @@ hlwImageSlice::hlwImageSlice() {
 hlwImageSlice::~hlwImageSlice() {
     delete sliceInfo;
 }
+
+void hlwImageSlice::getSliceExtent(int *_extent) {
+    for (int i = 0; i < 6; i++) {
+        _extent[i] = sliceInfo->Extent[i];
+    }
+}

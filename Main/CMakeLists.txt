@@ -16,5 +16,11 @@ SET(LIBS_NEEDED
         hlwImageSlice
         )
 
-ADD_EXECUTABLE(generate3d generate3d.cpp)
+ADD_EXECUTABLE(generate3d generate3dByFIrstMethod.cpp)
 TARGET_LINK_LIBRARIES(generate3d ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(generateSlices generate400SlicesByFIrstMethod.cpp)
+TARGET_LINK_LIBRARIES(generateSlices ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(generateSlices2nd generate400SlicesBy2ndMethod.cpp)
+TARGET_LINK_LIBRARIES(generateSlices2nd ${LIBS_NEEDED})

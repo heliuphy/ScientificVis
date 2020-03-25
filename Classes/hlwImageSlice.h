@@ -23,6 +23,8 @@ public:
 
     void setReferencePlaneInfo(ImageOriginSpacingExtent *_referencePlaneInfo);
 
+    void getSliceExtent(int* _extent);
+
 protected:
     int sliceIndex;
     ImageOriginSpacingExtent *sliceInfo;

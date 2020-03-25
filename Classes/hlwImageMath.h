@@ -23,11 +23,13 @@ public:
 
     void setOperatorToMultiplyK(int k);
 
+    void run() override;
+
+protected:
     void subTwoUnCharImageArray();
 
     void array1MultiplyByK();
 
-    void run() override;
 protected:
     vtkImageData *inputImageData2;
     int oper;
