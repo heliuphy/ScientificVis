@@ -30,8 +30,7 @@ public:
 
     void findPointIDToImfill(double *p1, double *p2);
 
-    void twoImagesSub(vtkImageData *_imageData1, vtkImageData *_imageData2, vtkImageData *_resultImageData);
-
+    void findAllIntersectionPoints(double *_p, int *_num);
 protected:
     emxArray_boolean_T *inputEmxArray;
     emxArray_boolean_T *outputEmxArray;

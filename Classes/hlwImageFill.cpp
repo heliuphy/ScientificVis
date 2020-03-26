@@ -121,3 +121,50 @@ void hlwImageFill::findPointIDToImfill(double *p1, double *p2) {
 
 }
 
+void hlwImageFill::findAllIntersectionPoints(double *_p, int *_num) {
+
+    int inputExtent[6];
+    inputImageData->GetExtent(inputExtent);
+
+    int horizontalLineExtent[6] = {0, 0, 0, 0, 0, 0};
+    horizontalLineExtent[1] = inputExtent[1];
+    horizontalLineExtent[2] = (inputExtent[3] - inputExtent[2]) / 2;
+    horizontalLineExtent[3] = horizontalLineExtent[2];
+    horizontalLineExtent[4] = inputExtent[4];
+    horizontalLineExtent[5] = inputExtent[5];
+
+
+    // 遇到的边界编号,从左往右应该遇到8次
+    int edgeNum = 0;
+    int edgeArray[8] = {0};
+    auto pixel = (unsigned char *) (inputImageData->GetScalarPointerForExtent(horizontalLineExtent));
+    for (int i = 0; i < horizontalLineExtent[1]; i++) {
+        if (*pixel != 0) {
+            edgeArray[edgeNum] = i;
+            edgeNum++;
+        }
+        pixel++;
+    }
+
+    // Determine the position of the four points relative
+    // to the center point to determine whether it is on
+    // the left or right half.
+
+    int _y = horizontalLineExtent[2];
+    int _z = horizontalLineExtent[4];
+    int ijk[3] = {0};
+    ijk[1] = _y;
+    ijk[2] = _z;
+    vtkIdType pointIDs[8] = {0};
+    for (int i = 0; i < edgeNum; i++) {
+        ijk[0] = edgeArray[i];
+        pointIDs[i] = inputImageData->ComputePointId(ijk);
+    }
+
+    for (int i = 0; i < edgeNum; i++) {
+        _p[i] = pointIDs[i];
+    }
+    *_num = edgeNum;
+
+}
+

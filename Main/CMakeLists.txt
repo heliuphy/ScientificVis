@@ -24,3 +24,6 @@ TARGET_LINK_LIBRARIES(generateSlices ${LIBS_NEEDED})
 
 ADD_EXECUTABLE(generateSlices2nd generate400SlicesBy2ndMethod.cpp)
 TARGET_LINK_LIBRARIES(generateSlices2nd ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(generate400Canny generate400Canny.cpp)
+TARGET_LINK_LIBRARIES(generate400Canny ${LIBS_NEEDED})

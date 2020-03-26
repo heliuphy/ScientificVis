@@ -29,9 +29,6 @@ hlwPlaneAlgorithms::~hlwPlaneAlgorithms() {
 
 void hlwPlaneAlgorithms::computePlaneSize() {
 
-    auto inputScalarPointer = (unsigned char *) (inputImageData->GetScalarPointer());
-    auto outputScalarPointer = (unsigned char *) (outputImageData->GetScalarPointer());
-
     int _dims[3];
     inputImageData->GetDimensions(_dims);
 
