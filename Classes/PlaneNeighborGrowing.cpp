@@ -100,57 +100,6 @@ void PlaneNeighborGrowing::neighborGrowOnAllImage() {
 //    }
 }
 
-void PlaneNeighborGrowing::findCircle(int _pointId, vector<int> &_list) {
-    queue<int> q;
-    unordered_set<int> hasVisited;
-    unordered_set<int> hasAddedToQueue;
-
-    int coordinates[2];
-
-    int eightNeighborsX[] = {-1, 0, 1, -1, 1, -1, 0, 1};
-    int eightNeighborsY[] = {1, 1, 1, 0, 0, -1, -1, -1};
-
-    q.push(_pointId);
-    hasAddedToQueue.insert(_pointId);
-
-    auto pixel = (unsigned char *) (inputImageData->GetScalarPointer());
-
-    while (!q.empty()) {
-
-        int qHead = q.front();
-
-//        cout << "qHead " << qHead;
-//        cout << "  queue size: " << q.size() << "  ";
-//        cout << "  hash map size  " << hasVisited.size() << "  ";
-//        cout << endl;
-
-        q.pop();
-        hasVisited.insert(qHead);
-        computePlaneCoordinates(qHead, coordinates);
-        for (int i = 0; i < 8; i++) {
-            int newCoordinates[2];
-            int newPid;
-
-            newCoordinates[0] = coordinates[0] + eightNeighborsX[i];
-            newCoordinates[1] = coordinates[1] + eightNeighborsY[i];
-            newPid = computePlanePointID(newCoordinates);
-
-            if (isInBound(newCoordinates[0], newCoordinates[1]) && pixel[newPid] == 1 &&
-                hasVisited.find(newPid) == hasVisited.end() && hasAddedToQueue.find(newPid) == hasAddedToQueue.end()) {
-                q.push(newPid);
-                hasAddedToQueue.insert((newPid));
-            }
-        }
-
-    }
-
-    cout << "Point ID which value is 1" << endl;
-
-    for (auto i = hasVisited.begin(); i != hasVisited.end(); i++) {
-//        cout << *i << " ";
-        _list.push_back(*i);
-    }
-}
 
 void PlaneNeighborGrowing::neighborGrowOnSpecifiedCircle() {
 
@@ -241,7 +190,17 @@ void PlaneNeighborGrowing::run() {
     }
 }
 
-void PlaneNeighborGrowing::setCircleVector(vector<int> *_circlePointsVector) {
+void PlaneNeighborGrowing::setCirclePointsVector(vector<int> *_circlePointsVector) {
     circlePoints = _circlePointsVector;
 }
+
+void PlaneNeighborGrowing::outputImageClear() {
+    if (elementSize == -1) {
+        computeElementSize();
+    }
+    auto outputPointer = (unsigned char *)(outputImageData->GetScalarPointer());
+
+    memset(outputPointer, 0, elementSize * sizeof(unsigned char));
+}
+
 

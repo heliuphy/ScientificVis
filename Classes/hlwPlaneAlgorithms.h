@@ -6,6 +6,12 @@
 #define MYPROJ_HLWPLANEALGORITHMS_H
 
 #include "hlwAlgorithms.h"
+#include <unordered_set>
+#include <vector>
+
+using std::unordered_set;
+using std::vector;
+
 
 class hlwPlaneAlgorithms : public hlwAlgorithms{
 public:
@@ -22,6 +28,11 @@ public:
     int computeElementSize();
 
     bool isInBound(int _pos0, int _pos1);
+
+    void findAllIntersectionPoints(double *_p, int *_num);
+
+    void findCircle(int _pointId, vector<int> &_circlePoints);
+
 protected:
 
     int *planeSize;

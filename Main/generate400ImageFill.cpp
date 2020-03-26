@@ -3,7 +3,6 @@
 //
 
 #include "generate3dByFIrstMethod.h"
-#include "CircleDelete.h"
 
 bool recordSpecialPlane(vtkImageData *_inputImageData, int _zIndex, vector<int> &_list) {
 
@@ -90,21 +89,31 @@ int main() {
     afterCannyImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 
-    vtkSmartPointer<vtkImageData> afterNeighborGrowImageData =
+    // Data structure for imagefill
+
+    vtkSmartPointer<vtkImageData> afterFillImageData =
             vtkSmartPointer<vtkImageData>::New();
-    afterNeighborGrowImageData->SetOrigin(referenceInfo.Origin);
-    afterNeighborGrowImageData->SetSpacing(referenceInfo.Spacing);
-    afterNeighborGrowImageData->SetExtent(referenceInfo.Extent);
-    afterNeighborGrowImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+    afterFillImageData->SetOrigin(referenceInfo.Origin);
+    afterFillImageData->SetSpacing(referenceInfo.Spacing);
+    afterFillImageData->SetExtent(referenceInfo.Extent);
+    afterFillImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
+    // Data structure for sub
 
-    vtkSmartPointer<vtkImageData> afterCircleDeleteImageData =
+    vtkSmartPointer<vtkImageData> afterSubImageData =
             vtkSmartPointer<vtkImageData>::New();
-    afterCircleDeleteImageData->SetOrigin(referenceInfo.Origin);
-    afterCircleDeleteImageData->SetSpacing(referenceInfo.Spacing);
-    afterCircleDeleteImageData->SetExtent(referenceInfo.Extent);
-    afterCircleDeleteImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+    afterSubImageData->SetOrigin(referenceInfo.Origin);
+    afterSubImageData->SetSpacing(referenceInfo.Spacing);
+    afterSubImageData->SetExtent(referenceInfo.Extent);
+    afterSubImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
+
+    vtkSmartPointer<vtkImageData> afterNeighborGrow =
+            vtkSmartPointer<vtkImageData>::New();
+    afterNeighborGrow->SetOrigin(referenceInfo.Origin);
+    afterNeighborGrow->SetSpacing(referenceInfo.Spacing);
+    afterNeighborGrow->SetExtent(referenceInfo.Extent);
+    afterNeighborGrow->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
     vtkSmartPointer<vtkImageData> afterMultiply =
             vtkSmartPointer<vtkImageData>::New();
@@ -135,10 +144,24 @@ int main() {
     cannyDetect.setOutputImageData(afterCannyImageData);
 
 
+    // object for ImageFill
+    real_T points[2];
+
+    hlwImageFill imageFill;
+    imageFill.setInputImageData(afterCannyImageData);
+    imageFill.setOutputImageData(afterFillImageData);
+
+
+    // object for sub
+    hlwImageMath imageSub;
+    imageSub.setInputImageData(afterFillImageData);
+    imageSub.setInputImageData2(afterCannyImageData);
+    imageSub.setOutputImageData(afterSubImageData);
+    imageSub.setOperatorToSub();
+
+
     // object for neighbor growing
-
-
-    CircleDelete circleDelete;
+    PlaneNeighborGrowing neighborGrowing;
 
 
     hlwImageMath multiply255;
@@ -146,12 +169,14 @@ int main() {
     //==========================================================================================
     //                        ==========       RUN        ==========
     //==========================================================================================
+
+
     // Z normal planes
     // 第一遍填充，完全按照普通情况处理
     // 并记录特殊面，以待后续处理
     vector<int> specialPlaneIndex;
 
-    for (int i = 199; i < 200; i++) {
+    for (int i = 0; i < 400; i++) {
 
         cout << "Now doing " << i << "th Plane! " << endl;
         // 1. 切面
@@ -166,98 +191,59 @@ int main() {
         cannyDetect.run();
 
 
-        ///////
-        PlaneNeighborGrowing neighborGrowing;
-        neighborGrowing.setInputImageData(afterCannyImageData);
-        neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-        neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-        neighborGrowing.run();
+        // 3. Image Fill , record special planes and put them to outputImageData
+        imageFill.findPointIDToImfill(points, points + 1);
+        imageFill.setFillPoints(points, 2);
+        imageFill.run();
 
-        double intersections[8];
-        int numIntersection = 0;
-        circleDelete.setInputImageData(afterCannyImageData);
-        circleDelete.findAllIntersectionPoints(intersections, &numIntersection);
-        cout << "intersection num : " << numIntersection << endl;
+        // 4. deal with special planes and put them to outputImageData
+        // 4.1 determine whether this plane is special or not
+        bool thisPlaneIsSpecial = recordSpecialPlane(afterFillImageData, i, specialPlaneIndex);
 
-        if (numIntersection == 4) {
-            // delete 2nd circle
-            vector<int> circle;
-
-            circleDelete.setInputImageData(afterCannyImageData);
-            circleDelete.setOutputImageData(afterCircleDeleteImageData);
-            circleDelete.findCircle(intersections[1], circle);
-            circleDelete.setDeleteCircle(circle);
-            circleDelete.run();
-
-            neighborGrowing.setInputImageData(afterCircleDeleteImageData);
-            neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-            neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-            neighborGrowing.run();
-
-        } else if (numIntersection == 6) {
-            // delete 2nd circle
-            vector<int> circle;
-            circleDelete.setInputImageData(afterCannyImageData);
-            circleDelete.setOutputImageData(afterCircleDeleteImageData);
-            circleDelete.findCircle(intersections[1], circle);
-            circleDelete.setDeleteCircle(circle);
-            circleDelete.run();
-
-            neighborGrowing.setInputImageData(afterCircleDeleteImageData);
-            neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-            neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-            neighborGrowing.run();
-
-        } else if (numIntersection == 8) {
-
-            vector<int> circle_1;
-            vector<int> circle_2;
-
-
-            circleDelete.setInputImageData(afterCannyImageData);
-            circleDelete.setOutputImageData(afterCircleDeleteImageData);
-            circleDelete.findCircle(intersections[1], circle_1);
-            circleDelete.findCircle(intersections[3], circle_2);
-
-
-            circle_1.reserve(circle_1.size() + circle_2.size());
-            for (auto i : circle_2) {
-                circle_1.push_back(i);
-            }
-
-            circleDelete.setDeleteCircle(circle_1);
-            circleDelete.run();
-
-            neighborGrowing.setInputImageData(afterCircleDeleteImageData);
-            neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-            neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-            neighborGrowing.run();
-
-
-        }
-
+        // generate 400 slice
         auto planePointerOf3dOutputData = (unsigned char *) (outputImageData->GetScalarPointerForExtent(
                 thisSliceExtent));
 
+        imageSub.run();
 
-        multiply255.setInputImageData(afterNeighborGrowImageData);
+        auto afterSubPointer = (unsigned char *) (afterSubImageData->GetScalarPointer());
+
+        int dims[3];
+        afterSubImageData->GetDimensions(dims);
+
+        int n = dims[0] * dims[1] * dims[2];
+
+//            memcpy(planePointerOf3dOutputData, afterSubPointer, n * sizeof(unsigned char));
+
+        multiply255.setInputImageData(afterSubImageData);
         multiply255.setOutputImageData(afterMultiply);
         multiply255.setOperatorToMultiplyK(255);
         multiply255.run();
 
         std::string _path;
         std::string _fileName;
-        _path = "/Users/heliu/temp/node-centered/step6/method2/";
+        _path = "/Users/heliu/temp/node-centered/step6/ImageFill400/";
         _fileName = _path + std::to_string(i) + ".png";
 
         writer->SetInputData(afterMultiply);
         writer->SetFileName(_fileName.c_str());
         writer->Write();
 
-        neighborGrowing.outputImageClear();
     }
 
+    cout << "Special planes are : " << endl;
 
+//    for (auto i : specialPlaneIndex) {
+//        cout << i << " ";
+//    }
+
+    cout << endl;
+
+//    vtkSmartPointer<vtkMetaImageWriter> writer =
+//            vtkSmartPointer<vtkMetaImageWriter>::New();
+//    writer->SetFileName("/Users/heliu/temp/node-centered/Test/3d-test.mhd");
+//    writer->SetInputData(outputImageData);
+//    writer->Write();
 }
 
 

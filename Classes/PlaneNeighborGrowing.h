@@ -28,11 +28,11 @@ public:
 
     void setNeighborDistance(int _neighborDistance);
 
-    void findCircle(int _pointId, vector<int> &_list);
-
     void setMode(int _m);
 
-    void setCircleVector(vector<int> *_circlePointsVector);
+    void setCirclePointsVector(vector<int> *_circlePointsVector);
+
+    void outputImageClear();
 
 protected:
     void neighborGrowOnSpecifiedCircle();

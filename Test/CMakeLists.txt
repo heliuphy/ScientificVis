@@ -16,7 +16,8 @@ SET(CLASSES_NEEDED_LIBS
         CannyDetect
         hlwImageFill
         hlwImageMath
-        hlwImageSlice)
+        hlwImageSlice
+        CircleDelete)
 
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Classes)
@@ -37,3 +38,9 @@ TARGET_LINK_LIBRARIES(hlwImageMathTest ${CLASSES_NEEDED_LIBS})
 
 ADD_EXECUTABLE(hlwImageSliceTest hlwImageSliceTest.cpp)
 TARGET_LINK_LIBRARIES(hlwImageSliceTest ${CLASSES_NEEDED_LIBS})
+
+ADD_EXECUTABLE(BreakPointConnectedTest BreakPointConnectedTest.cpp)
+TARGET_LINK_LIBRARIES(BreakPointConnectedTest ${CLASSES_NEEDED_LIBS})
+
+ADD_EXECUTABLE(DeleteCircleTest DeleteCircleTest.cpp)
+TARGET_LINK_LIBRARIES(DeleteCircleTest ${CLASSES_NEEDED_LIBS})

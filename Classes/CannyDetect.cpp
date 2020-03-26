@@ -19,7 +19,7 @@ CannyDetect::CannyDetect() {
 
 void CannyDetect::run() {
 
-    auto *inputDataPointer = (float *) (inputImageData->GetScalarPointer());
+    auto inputDataPointer = (float *) (inputImageData->GetScalarPointer());
 
     int _dims[3] = {0, 0, 0};
     inputImageData->GetDimensions(_dims);
@@ -36,7 +36,7 @@ void CannyDetect::run() {
     inputEmxArray->allocatedSize = inputEmxArray->size[0] * inputEmxArray->size[1];
     inputEmxArray->canFreeData = true;
 
-    auto *afterCannyDataPointer = (boolean_T *) (outputImageData->GetScalarPointer());
+    auto afterCannyDataPointer = (boolean_T *) (outputImageData->GetScalarPointer());
     outputEmxArray->data = afterCannyDataPointer;
     outputEmxArray->size[0] = size0;
     outputEmxArray->size[1] = size1;

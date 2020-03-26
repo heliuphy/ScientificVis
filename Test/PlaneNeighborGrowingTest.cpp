@@ -49,7 +49,7 @@ int main() {
 
 
     neighborGrowing.setMode(GROW_ON_CIRCLE);
-    neighborGrowing.setCircleVector(&l1);
+    neighborGrowing.setCirclePointsVector(&l1);
     neighborGrowing.run();
 
 

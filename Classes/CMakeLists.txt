@@ -30,3 +30,9 @@ TARGET_LINK_LIBRARIES(hlwImageMath ${CLASSES_NEEDED_LIBS})
 
 ADD_LIBRARY(hlwImageSlice hlwImageSlice.cpp)
 TARGET_LINK_LIBRARIES(hlwImageSlice ${CLASSES_NEEDED_LIBS})
+
+ADD_LIBRARY(BreakPointConnected BreakPointConnected.cpp)
+TARGET_LINK_LIBRARIES(BreakPointConnected ${CLASSES_NEEDED_LIBS})
+
+ADD_LIBRARY(CircleDelete CircleDelete.cpp)
+TARGET_LINK_LIBRARIES(CircleDelete ${CLASSES_NEEDED_LIBS})

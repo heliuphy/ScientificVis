@@ -14,6 +14,7 @@ SET(LIBS_NEEDED
         hlwImageFill
         hlwImageMath
         hlwImageSlice
+        CircleDelete
         )
 
 ADD_EXECUTABLE(generate3d generate3dByFIrstMethod.cpp)
@@ -27,3 +28,6 @@ TARGET_LINK_LIBRARIES(generateSlices2nd ${LIBS_NEEDED})
 
 ADD_EXECUTABLE(generate400Canny generate400Canny.cpp)
 TARGET_LINK_LIBRARIES(generate400Canny ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(generate400ImageFill generate400ImageFill.cpp)
+TARGET_LINK_LIBRARIES(generate400ImageFill ${LIBS_NEEDED})
