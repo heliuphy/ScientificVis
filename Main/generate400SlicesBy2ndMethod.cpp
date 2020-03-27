@@ -141,6 +141,10 @@ int main() {
     CircleDelete circleDelete;
 
 
+    PlaneNeighborGrowing neighborGrowing;
+    neighborGrowing.setNeighborDistance(3);
+
+
     hlwImageMath multiply255;
 
     //==========================================================================================
@@ -151,7 +155,7 @@ int main() {
     // 并记录特殊面，以待后续处理
     vector<int> specialPlaneIndex;
 
-    for (int i = 199; i < 200; i++) {
+    for (int i = 0; i < 400; i++) {
 
         cout << "Now doing " << i << "th Plane! " << endl;
         // 1. 切面
@@ -167,11 +171,6 @@ int main() {
 
 
         ///////
-        PlaneNeighborGrowing neighborGrowing;
-        neighborGrowing.setInputImageData(afterCannyImageData);
-        neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-        neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-        neighborGrowing.run();
 
         double intersections[8];
         int numIntersection = 0;
