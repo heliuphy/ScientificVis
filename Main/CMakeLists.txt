@@ -31,3 +31,6 @@ TARGET_LINK_LIBRARIES(generate400Canny ${LIBS_NEEDED})
 
 ADD_EXECUTABLE(generate400ImageFill generate400ImageFill.cpp)
 TARGET_LINK_LIBRARIES(generate400ImageFill ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(generate3dBy2ndMethod generate3dBy2ndMethod.cpp)
+TARGET_LINK_LIBRARIES(generate3dBy2ndMethod ${LIBS_NEEDED})
