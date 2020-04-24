@@ -2,12 +2,14 @@
 // Created by 何柳 on 2020/3/26.
 //
 #include "CircleDelete.h"
+#include "hlwImageMath.h"
 
 #include <iostream>
 #include <vtkMetaImageReader.h>
 #include <vtkSmartPointer.h>
 #include <vtkMetaImageWriter.h>
 #include <PlaneNeighborGrowing.h>
+#include <vtkPNGWriter.h>
 
 using std::iostream;
 
@@ -15,7 +17,7 @@ using std::iostream;
 int main() {
     vtkSmartPointer<vtkMetaImageReader> reader =
             vtkSmartPointer<vtkMetaImageReader>::New();
-    reader->SetFileName("/Users/heliu/temp/node-centered/Test/Canny-test.mhd");
+    reader->SetFileName("/Users/heliu/OneDrive/Data/node-centered/Test/Canny-test.mhd");
     reader->Update();
 
     vtkSmartPointer<vtkImageData> afterNeighborGrowImageData =
@@ -33,6 +35,13 @@ int main() {
     afterDeleteCircle->SetExtent(reader->GetOutput()->GetExtent());
     afterDeleteCircle->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
+    vtkSmartPointer<vtkImageData> afterDeleteCircle2 =
+            vtkSmartPointer<vtkImageData>::New();
+    afterDeleteCircle2->SetOrigin(reader->GetOutput()->GetOrigin());
+    afterDeleteCircle2->SetSpacing(reader->GetOutput()->GetSpacing());
+    afterDeleteCircle2->SetExtent(reader->GetOutput()->GetExtent());
+    afterDeleteCircle2->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+
     vtkSmartPointer<vtkImageData> outputImageData =
             vtkSmartPointer<vtkImageData>::New();
     outputImageData->SetOrigin(reader->GetOutput()->GetOrigin());
@@ -49,7 +58,9 @@ int main() {
     int numP;
     planeNeighborGrowing.findAllIntersectionPoints(p, &numP);
     vector<int> circle;
-    planeNeighborGrowing.findCircle(p[0], circle);
+    vector<int> circle2;
+    planeNeighborGrowing.findCircle(p[1], circle);
+    planeNeighborGrowing.findCircle(p[3], circle2);
 
 
     CircleDelete circleDelete;
@@ -58,11 +69,24 @@ int main() {
     circleDelete.setDeleteCircle(circle);
     circleDelete.run();
 
-    vtkSmartPointer<vtkMetaImageWriter> writer =
-            vtkSmartPointer<vtkMetaImageWriter>::New();
+    CircleDelete circleDelete2;
+    circleDelete2.setInputImageData(afterDeleteCircle);
+    circleDelete2.setOutputImageData(afterDeleteCircle2);
+    circleDelete2.setDeleteCircle(circle2);
+    circleDelete2.run();
 
-    writer->SetFileName("/Users/heliu/temp/node-centered/Test/circleDelete-test.mhd");
-    writer->SetInputData(afterDeleteCircle);
+    hlwImageMath imageMath;
+    imageMath.setInputImageData(afterDeleteCircle2);
+    imageMath.setOutputImageData(outputImageData);
+    imageMath.setOperatorToMultiplyK(255);
+    imageMath.run();
+
+
+    vtkSmartPointer<vtkPNGWriter> writer =
+            vtkSmartPointer<vtkPNGWriter>::New();
+
+    writer->SetFileName("/Users/heliu/OneDrive/Data/node-centered/Test/circleDelete-test.png");
+    writer->SetInputData(outputImageData);
     writer->Write();
 }
 

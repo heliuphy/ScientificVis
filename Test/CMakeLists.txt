@@ -17,7 +17,10 @@ SET(CLASSES_NEEDED_LIBS
         hlwImageFill
         hlwImageMath
         hlwImageSlice
-        CircleDelete)
+        CircleDelete
+        AreaDelete
+        SliceTypeDetector
+        )
 
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/Classes)
@@ -44,3 +47,6 @@ TARGET_LINK_LIBRARIES(BreakPointConnectedTest ${CLASSES_NEEDED_LIBS})
 
 ADD_EXECUTABLE(DeleteCircleTest DeleteCircleTest.cpp)
 TARGET_LINK_LIBRARIES(DeleteCircleTest ${CLASSES_NEEDED_LIBS})
+
+ADD_EXECUTABLE(SliceTypeDetectorTest SliceTypeDetectorTest.cpp)
+TARGET_LINK_LIBRARIES(SliceTypeDetectorTest ${CLASSES_NEEDED_LIBS})

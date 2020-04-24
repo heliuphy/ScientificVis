@@ -36,3 +36,9 @@ TARGET_LINK_LIBRARIES(BreakPointConnected ${CLASSES_NEEDED_LIBS})
 
 ADD_LIBRARY(CircleDelete CircleDelete.cpp)
 TARGET_LINK_LIBRARIES(CircleDelete ${CLASSES_NEEDED_LIBS})
+
+ADD_LIBRARY(AreaDelete AreaDelete.cpp)
+TARGET_LINK_LIBRARIES(AreaDelete ${CLASSES_NEEDED_LIBS})
+
+ADD_LIBRARY(SliceTypeDetector SliceTypeDetector.cpp)
+TARGET_LINK_LIBRARIES(SliceTypeDetector ${CLASSES_NEEDED_LIBS})

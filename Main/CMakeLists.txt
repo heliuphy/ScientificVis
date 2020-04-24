@@ -15,6 +15,8 @@ SET(LIBS_NEEDED
         hlwImageMath
         hlwImageSlice
         CircleDelete
+        AreaDelete
+        SliceTypeDetector
         )
 
 ADD_EXECUTABLE(generate3d generate3dByFIrstMethod.cpp)
@@ -34,3 +36,6 @@ TARGET_LINK_LIBRARIES(generate400ImageFill ${LIBS_NEEDED})
 
 ADD_EXECUTABLE(generate3dBy2ndMethod generate3dBy2ndMethod.cpp)
 TARGET_LINK_LIBRARIES(generate3dBy2ndMethod ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(testFourSpecialZIndexes testFourSpecialZIndexes.cpp)
+TARGET_LINK_LIBRARIES(testFourSpecialZIndexes ${LIBS_NEEDED})
