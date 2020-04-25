@@ -14,7 +14,7 @@ void CircleDelete::deleteCircle() {
         computeElementSize();
     }
     assert(elementSize >= 0);
-    memcpy(outputPixel,inputPixel, elementSize * sizeof(unsigned char));
+    memcpy(outputPixel, inputPixel, elementSize * sizeof(unsigned char));
 
     for (auto i :circleVector) {
         outputPixel[i] = 0;
@@ -27,4 +27,13 @@ void CircleDelete::run() {
 
 void CircleDelete::setDeleteCircle(vector<int> _deleteCircle) {
     circleVector = std::move(_deleteCircle);
+}
+
+void CircleDelete::outputImageClear() {
+    if (elementSize == -1) {
+        computeElementSize();
+    }
+    auto outputPointer = (unsigned char *) (outputImageData->GetScalarPointer());
+
+    memset(outputPointer, 0, elementSize * sizeof(unsigned char));
 }

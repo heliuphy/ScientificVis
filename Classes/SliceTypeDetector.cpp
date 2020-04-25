@@ -18,11 +18,11 @@ void SliceTypeDetector::findHorizontalIntersectionPoints(vector<int> &pointArray
     inputImageData->GetExtent(inputExtent);
 
     //DEBUG
-    cout << "inputExtent: ";
-    for (int i = 0; i < 6; i++) {
-        cout << inputExtent[i] << " ";
-    }
-    cout << endl;
+//    cout << "inputExtent: ";
+//    for (int i = 0; i < 6; i++) {
+//        cout << inputExtent[i] << " ";
+//    }
+//    cout << endl;
     //
 
     int horizontalLineExtent[6] = {0, 0, 0, 0, 0, 0};
@@ -33,11 +33,11 @@ void SliceTypeDetector::findHorizontalIntersectionPoints(vector<int> &pointArray
     horizontalLineExtent[5] = inputExtent[5];
 
     //DEBUG
-    cout << "horizontalLineExtent: ";
-    for (int i = 0; i < 6; i++) {
-        cout << horizontalLineExtent[i] << " ";
-    }
-    cout << endl;
+//    cout << "horizontalLineExtent: ";
+//    for (int i = 0; i < 6; i++) {
+//        cout << horizontalLineExtent[i] << " ";
+//    }
+//    cout << endl;
     //
 
     vector<int> edgeArray;
@@ -168,5 +168,101 @@ void SliceTypeDetector::run() {
 }
 
 void SliceTypeDetector::detectType() {
+    int horizontalIntersectionNum = 0;
+    int verticalIntersectionNum = 0;
+    int slashIntersectionNum = 0;
+    int backslashIntersectionNum = 0;
 
+    findHorizontalIntersectionPoints();
+    findVerticalIntersectionPoints();
+    findSlashIntersectionPoints();
+    findBackslashIntersectionPoints();
+
+    horizontalIntersectionNum = horizontalIntersections.size();
+    verticalIntersectionNum = verticalIntersections.size();
+    slashIntersectionNum = slashIntersections.size();
+    backslashIntersectionNum = backslashIntersections.size();
+
+    if (horizontalIntersectionNum == 8 &&
+        verticalIntersectionNum == 8 &&
+        slashIntersectionNum == 8 &&
+        backslashIntersectionNum == 8
+            ) {
+        type = 8888;
+    } else if (horizontalIntersectionNum == 6 &&
+               verticalIntersectionNum == 6 &&
+               slashIntersectionNum == 8 &&
+               backslashIntersectionNum == 8) {
+        type = 6688;
+    } else if (horizontalIntersectionNum == 4 &&
+               verticalIntersectionNum == 4 &&
+               slashIntersectionNum == 4 &&
+               backslashIntersectionNum == 4) {
+        type = 4444;
+    } else if (horizontalIntersectionNum == 6 &&
+               verticalIntersectionNum == 6 &&
+               slashIntersectionNum == 6 &&
+               backslashIntersectionNum == 6) {
+        type = 6666;
+    } else if (horizontalIntersectionNum == 2 &&
+               verticalIntersectionNum == 2 &&
+               slashIntersectionNum == 4 &&
+               backslashIntersectionNum == 4) {
+        type = 2244;
+    } else {
+        type = -1;
+    }
+}
+
+void SliceTypeDetector::findHorizontalIntersectionPoints() {
+    findHorizontalIntersectionPoints(horizontalIntersections);
+}
+
+void SliceTypeDetector::findVerticalIntersectionPoints() {
+    findVerticalIntersectionPoints(verticalIntersections);
+}
+
+void SliceTypeDetector::findSlashIntersectionPoints() {
+    findSlashIntersectionPoints(slashIntersections);
+}
+
+void SliceTypeDetector::findBackslashIntersectionPoints() {
+    findBackslashIntersectionPoints(backslashIntersections);
+}
+
+int SliceTypeDetector::getType() const {
+    return type;
+}
+
+const vector<int> &SliceTypeDetector::getHorizontalIntersections() const {
+    return horizontalIntersections;
+}
+
+const vector<int> &SliceTypeDetector::getVerticalIntersections() const {
+    return verticalIntersections;
+}
+
+const vector<int> &SliceTypeDetector::getSlashIntersections() const {
+    return slashIntersections;
+}
+
+const vector<int> &SliceTypeDetector::getBackslashIntersections() const {
+    return backslashIntersections;
+}
+
+void SliceTypeDetector::outputImageClear() {
+    if (elementSize == -1) {
+        computeElementSize();
+    }
+    auto outputPointer = (unsigned char *) (outputImageData->GetScalarPointer());
+
+    memset(outputPointer, 0, elementSize * sizeof(unsigned char));
+}
+
+void SliceTypeDetector::initializeParams() {
+    type = 0;
+    horizontalIntersections.clear();
+    verticalIntersections.clear();
+    slashIntersections.clear();
+    backslashIntersections.clear();
 }

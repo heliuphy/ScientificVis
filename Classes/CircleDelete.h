@@ -17,6 +17,8 @@ public:
 
     void setDeleteCircle(vector<int> _deleteCircle);
 
+    void outputImageClear();
+
 protected:
 
     void deleteCircle();

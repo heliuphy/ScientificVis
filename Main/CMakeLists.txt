@@ -39,3 +39,6 @@ TARGET_LINK_LIBRARIES(generate3dBy2ndMethod ${LIBS_NEEDED})
 
 ADD_EXECUTABLE(testFourSpecialZIndexes testFourSpecialZIndexes.cpp)
 TARGET_LINK_LIBRARIES(testFourSpecialZIndexes ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(generate400SlicesBy2ndMethodPlus generate400SlicesBy2ndMethodPlus.cpp)
+TARGET_LINK_LIBRARIES(generate400SlicesBy2ndMethodPlus ${LIBS_NEEDED})
