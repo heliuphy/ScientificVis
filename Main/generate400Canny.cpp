@@ -12,12 +12,12 @@ int main() {
     // Reading 3d data plane and reference plane
     vtkSmartPointer<vtkMetaImageReader> d3reader =
             vtkSmartPointer<vtkMetaImageReader>::New();
-    d3reader->SetFileName("/Users/heliu/temp/node-centered/Step1Reslice/volume800Meta.mhd");
+    d3reader->SetFileName("/Users/heliu/data/MultiTImeStep/raw/Pressure_T0900.mhd");
     d3reader->Update();
 
     vtkSmartPointer<vtkMetaImageReader> referencePlaneReader =
             vtkSmartPointer<vtkMetaImageReader>::New();
-    referencePlaneReader->SetFileName("/Users/heliu/temp/node-centered/Step1Reslice/output/plane.mhd");
+    referencePlaneReader->SetFileName("/Users/heliu/data/MultiTImeStep/reference/plane.mhd");
     referencePlaneReader->Update();
 
 
@@ -115,7 +115,7 @@ int main() {
 
         std::string _path;
         std::string _fileName;
-        _path = "/Users/heliu/temp/node-centered/step6/canny400/";
+        _path = "/Users/heliu/data/MultiTImeStep/canny400/time900/";
         _fileName = _path + std::to_string(i) + ".png";
 
         writer->SetInputData(afterMultiply);

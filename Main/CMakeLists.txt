@@ -17,6 +17,7 @@ SET(LIBS_NEEDED
         CircleDelete
         AreaDelete
         SliceTypeDetector
+        DrawCircles
         )
 
 ADD_EXECUTABLE(generate3d generate3dByFIrstMethod.cpp)
@@ -45,3 +46,15 @@ TARGET_LINK_LIBRARIES(generate400SlicesBy2ndMethodPlus ${LIBS_NEEDED})
 
 ADD_EXECUTABLE(generate3dBy2ndMethodPlus generate3dBy2ndMethodPlus.cpp)
 TARGET_LINK_LIBRARIES(generate3dBy2ndMethodPlus ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(SecondGenerate400Slices SecondGenerate400Slices.cpp)
+TARGET_LINK_LIBRARIES(SecondGenerate400Slices ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(SecondGenerate3d SecondGenerate3d.cpp)
+TARGET_LINK_LIBRARIES(SecondGenerate3d ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(SecondGenerate3d_Time_900 SecondGenerate3d_Time_900.cpp)
+TARGET_LINK_LIBRARIES(SecondGenerate3d_Time_900 ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(generate400CannyOnlyReserveCircle generate400CannyOnlyReserveCircle.cpp)
+TARGET_LINK_LIBRARIES(generate400CannyOnlyReserveCircle ${LIBS_NEEDED})

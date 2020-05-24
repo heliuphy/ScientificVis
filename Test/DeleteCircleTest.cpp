@@ -59,8 +59,8 @@ int main() {
     planeNeighborGrowing.findAllIntersectionPoints(p, &numP);
     vector<int> circle;
     vector<int> circle2;
-    planeNeighborGrowing.findCircle(p[1], circle);
-    planeNeighborGrowing.findCircle(p[3], circle2);
+    planeNeighborGrowing.findCircleOld(p[1], circle);
+    planeNeighborGrowing.findCircleOld(p[3], circle2);
 
 
     CircleDelete circleDelete;

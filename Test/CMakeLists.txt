@@ -21,6 +21,7 @@ SET(CLASSES_NEEDED_LIBS
         CircleDelete
         AreaDelete
         SliceTypeDetector
+        DrawCircles
         )
 
 

@@ -35,6 +35,8 @@ public:
 
     void initializeParams();
 
+    bool thisConnectedAreaIsCircle(vector<int> &_connectedArea);
+
     void run() override;
 
 public:
@@ -55,6 +57,10 @@ protected:
     vector<int> verticalIntersections;
     vector<int> slashIntersections;
     vector<int> backslashIntersections;
+
+private:
+    bool twoIntersectionsIsNearby(int _pointId1, int _pointId2);
+    int mathAbs(int _num);
 };
 
 

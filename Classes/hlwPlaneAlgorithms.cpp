@@ -149,7 +149,7 @@ void hlwPlaneAlgorithms::findAllIntersectionPoints(double *_p, int *_num) {
 
 }
 
-void hlwPlaneAlgorithms::findCircle(int _pointId, vector<int> &_circlePoints) {
+void hlwPlaneAlgorithms::findCircleOld(int _pointId, vector<int> &_circlePoints) {
     queue<int> q;
     unordered_set<int> hasVisited;
     unordered_set<int> hasAddedToQueue;
@@ -193,7 +193,7 @@ void hlwPlaneAlgorithms::findCircle(int _pointId, vector<int> &_circlePoints) {
 
     }
 
-    cout << "Point ID which value is 1" << endl;
+//    cout << "Point ID which value is 1" << endl;
 
     for (auto i = hasVisited.begin(); i != hasVisited.end(); i++) {
 //        cout << *i << " ";
@@ -243,4 +243,6 @@ void hlwPlaneAlgorithms::findConnectedArea(int _pointId, vector<int> &_connected
         _connectedArea.push_back(*i);
     }
 }
+
+
 

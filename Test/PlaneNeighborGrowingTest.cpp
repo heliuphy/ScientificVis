@@ -39,8 +39,8 @@ int main() {
     neighborGrowing.setOutputImageData(outputImageData);
     neighborGrowing.computePlaneSize();
     neighborGrowing.computeElementSize();
-    neighborGrowing.findCircle(p[0], l1);
-    neighborGrowing.findCircle(p[2], l2);
+    neighborGrowing.findCircleOld(p[0], l1);
+    neighborGrowing.findCircleOld(p[2], l2);
 
     l1.reserve(l1.size() + l2.size());
     for (auto i : l2) {

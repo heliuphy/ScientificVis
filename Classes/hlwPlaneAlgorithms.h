@@ -31,9 +31,10 @@ public:
 
     void findAllIntersectionPoints(double *_p, int *_num);
 
-    void findCircle(int _pointId, vector<int> &_circlePoints);
+    void findCircleOld(int _pointId, vector<int> &_circlePoints);
 
     void findConnectedArea(int _pointId, vector<int> &_connectedArea);
+
 
 protected:
 

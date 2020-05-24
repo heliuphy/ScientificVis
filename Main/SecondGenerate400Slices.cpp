@@ -4,33 +4,8 @@
 
 #include "generate3dByFIrstMethod.h"
 #include "CircleDelete.h"
-
-bool recordSpecialPlane(vtkImageData *_inputImageData, int _zIndex, vector<int> &_list) {
-
-    auto _inputPointer = (unsigned char *) (_inputImageData->GetScalarPointer());
-
-    int _dims[3];
-    _inputImageData->GetDimensions(_dims);
-    int _n = _dims[0] * _dims[1] * _dims[2];
-
-    int count_0 = 0, count_1 = 0;
-
-    for (int i = 0; i < _n; i++) {
-        if (_inputPointer[i] == 1) {
-            count_1++;
-        } else {
-            count_0++;
-        }
-    }
-    assert(count_0 + count_1 == _n);
-
-    if ((float) (count_1) / (float) (_n) > 0.16) {
-        _list.push_back(_zIndex);
-        return true;
-    }
-
-    return false;
-}
+#include "SliceTypeDetector.h"
+#include "DrawCircles.h"
 
 int main() {
 
@@ -38,14 +13,15 @@ int main() {
     //                        ==========       READ FILE        ==========
     //==========================================================================================
     // Reading 3d data plane and reference plane
+    // /Users/heliu/OneDrive/Data/node-centered
     vtkSmartPointer<vtkMetaImageReader> d3reader =
             vtkSmartPointer<vtkMetaImageReader>::New();
-    d3reader->SetFileName("/Users/heliu/temp/node-centered/Step1Reslice/volume800Meta.mhd");
+    d3reader->SetFileName("/Users/heliu/data/MultiTImeStep/raw/Pressure_T0300.mhd");
     d3reader->Update();
 
     vtkSmartPointer<vtkMetaImageReader> referencePlaneReader =
             vtkSmartPointer<vtkMetaImageReader>::New();
-    referencePlaneReader->SetFileName("/Users/heliu/temp/node-centered/Step1Reslice/output/plane.mhd");
+    referencePlaneReader->SetFileName("/Users/heliu/data/MultiTImeStep/reference/plane.mhd");
     referencePlaneReader->Update();
 
 
@@ -98,12 +74,12 @@ int main() {
     afterNeighborGrowImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 
-    vtkSmartPointer<vtkImageData> afterCircleDeleteImageData =
+    vtkSmartPointer<vtkImageData> afterDrawCircleImageData =
             vtkSmartPointer<vtkImageData>::New();
-    afterCircleDeleteImageData->SetOrigin(referenceInfo.Origin);
-    afterCircleDeleteImageData->SetSpacing(referenceInfo.Spacing);
-    afterCircleDeleteImageData->SetExtent(referenceInfo.Extent);
-    afterCircleDeleteImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+    afterDrawCircleImageData->SetOrigin(referenceInfo.Origin);
+    afterDrawCircleImageData->SetSpacing(referenceInfo.Spacing);
+    afterDrawCircleImageData->SetExtent(referenceInfo.Extent);
+    afterDrawCircleImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 
     vtkSmartPointer<vtkImageData> afterMultiply =
@@ -126,36 +102,28 @@ int main() {
     imageSlice.setInputImageData(d3InputImageData);
     imageSlice.setOutputImageData(workingOriginalPlaneImageData);
     imageSlice.setReferencePlaneInfo(&referenceInfo);
-//    imageSlice.setSliceIndex(199);
-//    imageSlice.computeSlicePlaneInformation();
 
     // object for canny
     CannyDetect cannyDetect;
     cannyDetect.setInputImageData(workingOriginalPlaneImageData);
     cannyDetect.setOutputImageData(afterCannyImageData);
 
+    // object for detecting edge types
+    SliceTypeDetector sliceTypeDetector;
 
-    // object for neighbor growing
-
-
-    CircleDelete circleDelete;
-
+    DrawCircles drawCircles;
 
     PlaneNeighborGrowing neighborGrowing;
     neighborGrowing.setNeighborDistance(3);
-
 
     hlwImageMath multiply255;
 
     //==========================================================================================
     //                        ==========       RUN        ==========
     //==========================================================================================
-    // Z normal planes
-    // 第一遍填充，完全按照普通情况处理
-    // 并记录特殊面，以待后续处理
-    vector<int> specialPlaneIndex;
 
     for (int i = 0; i < 400; i++) {
+//    for (int i = 58; i < 80; i++) {
 
         cout << "Now doing " << i << "th Plane! " << endl;
         // 1. 切面
@@ -169,71 +137,88 @@ int main() {
         // 2. Canny Detect
         cannyDetect.run();
 
+        // Type Detector
+        sliceTypeDetector.setInputImageData(afterCannyImageData);
+        vector<int> intersections;
+        sliceTypeDetector.findHorizontalIntersectionPoints(intersections);
+        cout << "num of intersection points: " << intersections.size() << endl;
 
-        ///////
-
-        double intersections[8];
-        int numIntersection = 0;
-        circleDelete.setInputImageData(afterCannyImageData);
-        circleDelete.findAllIntersectionPoints(intersections, &numIntersection);
-        cout << "intersection num : " << numIntersection << endl;
-
-        if (numIntersection == 4) {
-            // delete 2nd circle
-            vector<int> circle;
-
-            circleDelete.setInputImageData(afterCannyImageData);
-            circleDelete.setOutputImageData(afterCircleDeleteImageData);
-            circleDelete.findCircleOld(intersections[1], circle);
-            circleDelete.setDeleteCircle(circle);
-            circleDelete.run();
-
-            neighborGrowing.setInputImageData(afterCircleDeleteImageData);
-            neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-            neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-            neighborGrowing.run();
-
-        } else if (numIntersection == 6) {
-            // delete 2nd circle
-            vector<int> circle;
-            circleDelete.setInputImageData(afterCannyImageData);
-            circleDelete.setOutputImageData(afterCircleDeleteImageData);
-            circleDelete.findCircleOld(intersections[1], circle);
-            circleDelete.setDeleteCircle(circle);
-            circleDelete.run();
-
-            neighborGrowing.setInputImageData(afterCircleDeleteImageData);
-            neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-            neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-            neighborGrowing.run();
-
-        } else if (numIntersection == 8) {
-
-            vector<int> circle_1;
-            vector<int> circle_2;
-
-
-            circleDelete.setInputImageData(afterCannyImageData);
-            circleDelete.setOutputImageData(afterCircleDeleteImageData);
-            circleDelete.findCircleOld(intersections[1], circle_1);
-            circleDelete.findCircleOld(intersections[3], circle_2);
-
-
-            circle_1.reserve(circle_1.size() + circle_2.size());
-            for (auto i : circle_2) {
-                circle_1.push_back(i);
+        int numConnectedArea = intersections.size() / 2;
+        vector<vector<int>> vecConnectedArea(numConnectedArea, vector<int>());
+        // 如果相连区域较多，很可能是检测出了问题
+        if (numConnectedArea <= 50) {
+            for (int j = 0; j < numConnectedArea; j++) {
+                sliceTypeDetector.findConnectedArea(intersections[j], vecConnectedArea[j]);
             }
+        }
 
-            circleDelete.setDeleteCircle(circle_1);
-            circleDelete.run();
+//        sliceTypeDetector.findConnectedArea(intersections[1], connectedArea0);
+//        sliceTypeDetector.findConnectedArea(intersections[2], connectedArea1);
+//
+        vector<bool> vecIsCircle(numConnectedArea, false);
 
-            neighborGrowing.setInputImageData(afterCircleDeleteImageData);
-            neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-            neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-            neighborGrowing.run();
+        // 如果相连区域较多，很可能是检测出了问题
+        if (numConnectedArea <= 50) {
+            for (int j = 0; j < numConnectedArea; j++) {
+                vecIsCircle[j] = sliceTypeDetector.thisConnectedAreaIsCircle(vecConnectedArea[j]);
 
+                cout << "area " << j << " is circle ? " << vecIsCircle[j] << endl;
+            }
+        }
+
+        vector<vector<int> *> vecPCircles;
+
+        // 如果相连区域较多，很可能是检测出了问题
+        if (numConnectedArea <= 50) {
+            for (int j = 0; j < numConnectedArea; j++) {
+                if (vecIsCircle[j]) {
+                    vecPCircles.push_back(&(vecConnectedArea[j]));
+                }
+            }
+            cout << "Circle num is " << vecPCircles.size() << endl;
 
         }
+
+        // Draw Circles
+        if ((i >= 0 && i <= 59) || (i >= 340 && i <= 399)) {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            drawCircles.outputImageClear();
+        }
+        if ((i >= 60 && i <= 63) || (i >= 336 && i <= 339)) {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            drawCircles.copyInputToOutput();
+        }
+        if ((i >= 64 && i <= 157) || (i >= 242 && i <= 335)) {
+            // 只保留 0 号圈
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            drawCircles.setCirclesToDraw(*vecPCircles[0]);
+            drawCircles.run();
+        }
+        if (i >= 158 && i <= 241) {
+            // 只保留 0 号圈 和 2 号圈
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0]) {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[2]) {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+
+
+        // 3. Neighbor Growing
+        neighborGrowing.setInputImageData(afterDrawCircleImageData);
+        neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
+        neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
+        neighborGrowing.run();
+
 
         auto planePointerOf3dOutputData = (unsigned char *) (outputImageData->GetScalarPointerForExtent(
                 thisSliceExtent));
@@ -246,16 +231,19 @@ int main() {
 
         std::string _path;
         std::string _fileName;
-        _path = "/Users/heliu/temp/node-centered/step6/method2/";
+        _path = "/Users/heliu/data/MultiTImeStep/neighborGrow400/time300/";
         _fileName = _path + std::to_string(i) + ".png";
 
-        writer->SetInputData(afterMultiply);
-        writer->SetFileName(_fileName.c_str());
-        writer->Write();
+        bool writeFile = true;
+        if (writeFile) {
+            writer->SetInputData(afterMultiply);
+            writer->SetFileName(_fileName.c_str());
+            writer->Write();
+        }
 
         neighborGrowing.outputImageClear();
+        sliceTypeDetector.initializeParams();
     }
-
 
 }
 

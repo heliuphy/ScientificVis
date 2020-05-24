@@ -167,8 +167,8 @@ int main() {
             }
         }
 
-        sliceTypeDetector.findCircle(sliceTypeDetector.getHorizontalIntersections().at(1),
-                                     fakeOuterCircle);
+        sliceTypeDetector.findCircleOld(sliceTypeDetector.getHorizontalIntersections().at(1),
+                                        fakeOuterCircle);
 
         for (auto p : fakeOuterCircle) {
             fakeInnerCircle.push_back(p);
@@ -220,8 +220,8 @@ int main() {
                 }
             }
 
-            sliceTypeDetector.findCircle(sliceTypeDetector.getHorizontalIntersections().at(3),
-                                         fakeInnerCircle);
+            sliceTypeDetector.findCircleOld(sliceTypeDetector.getHorizontalIntersections().at(3),
+                                            fakeInnerCircle);
 
             for (auto p :fakeInnerCircle) {
                 fakeOuterCircle.push_back(p);
@@ -239,10 +239,10 @@ int main() {
             vector<int> InnerCircle;
             vector<int> OuterCircle;
 
-            sliceTypeDetector.findCircle(sliceTypeDetector.getHorizontalIntersections().at(1),
-                                         OuterCircle);
-            sliceTypeDetector.findCircle((sliceTypeDetector.getHorizontalIntersections().at(3)),
-                                         InnerCircle);
+            sliceTypeDetector.findCircleOld(sliceTypeDetector.getHorizontalIntersections().at(1),
+                                            OuterCircle);
+            sliceTypeDetector.findCircleOld((sliceTypeDetector.getHorizontalIntersections().at(3)),
+                                            InnerCircle);
             for (auto p : OuterCircle) {
                 InnerCircle.push_back(p);
             }
