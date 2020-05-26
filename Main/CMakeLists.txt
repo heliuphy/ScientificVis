@@ -58,3 +58,12 @@ TARGET_LINK_LIBRARIES(SecondGenerate3d_Time_900 ${LIBS_NEEDED})
 
 ADD_EXECUTABLE(generate400CannyOnlyReserveCircle generate400CannyOnlyReserveCircle.cpp)
 TARGET_LINK_LIBRARIES(generate400CannyOnlyReserveCircle ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(SecondGenerate400Slices_Time_900 SecondGenerate400Slices_Time_900.cpp)
+TARGET_LINK_LIBRARIES(SecondGenerate400Slices_Time_900 ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(SecondGenerate3d_Time_1200 SecondGenerate3d_Time_1200.cpp)
+TARGET_LINK_LIBRARIES(SecondGenerate3d_Time_1200 ${LIBS_NEEDED})
+
+ADD_EXECUTABLE(SecondGenerate400Slices_Time_1200 SecondGenerate400Slices_Time_1200.cpp)
+TARGET_LINK_LIBRARIES(SecondGenerate400Slices_Time_1200 ${LIBS_NEEDED})

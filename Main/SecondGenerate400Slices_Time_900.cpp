@@ -90,8 +90,8 @@ int main() {
     afterMultiply->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 
-    vtkSmartPointer<vtkMetaImageWriter> writer =
-            vtkSmartPointer<vtkMetaImageWriter>::New();
+    vtkSmartPointer<vtkPNGWriter> writer =
+            vtkSmartPointer<vtkPNGWriter>::New();
 
     //==========================================================================================
     //                  ==========       ALGORITHM        ==========
@@ -122,8 +122,8 @@ int main() {
     //                        ==========       RUN        ==========
     //==========================================================================================
 
-    for (int i = 0; i < 400; i++) {
-//    for (int i = 44; i < 46; i++) {
+//    for (int i = 0; i < 400; i++) {
+    for (int i = 52; i <= 53; i++) {
 
         cout << "Now doing " << i << "th Plane! " << endl;
         // 1. 切面
@@ -284,25 +284,28 @@ int main() {
         auto planePointerOf3dOutputData = (unsigned char *) (outputImageData->GetScalarPointerForExtent(
                 thisSliceExtent));
 
-        auto afterNeighborGrowPointer = (unsigned char *) (afterNeighborGrowImageData->GetScalarPointer());
 
-        int dims[3];
-        afterNeighborGrowImageData->GetDimensions(dims);
+        multiply255.setInputImageData(afterNeighborGrowImageData);
+        multiply255.setOutputImageData(afterMultiply);
+        multiply255.setOperatorToMultiplyK(255);
+        multiply255.run();
 
-        int n = dims[0] * dims[1] * dims[2];
+        std::string _path;
+        std::string _fileName;
+        _path = "/Users/heliu/data/MultiTImeStep/neighborGrow400/time900/";
+        _fileName = _path + std::to_string(i) + ".png";
 
-        memcpy(planePointerOf3dOutputData, afterNeighborGrowPointer, n * sizeof(unsigned char));
+        bool writeFile = true;
+        if (writeFile) {
+            writer->SetInputData(afterMultiply);
+            writer->SetFileName(_fileName.c_str());
+            writer->Write();
+        }
 
         neighborGrowing.outputImageClear();
         sliceTypeDetector.initializeParams();
     }
 
-    std::string _fileName;
-    _fileName = "/Users/heliu/data/MultiTImeStep/result/time900/3d.mhd";
-
-    writer->SetInputData(outputImageData);
-    writer->SetFileName(_fileName.c_str());
-    writer->Write();
 }
 
 

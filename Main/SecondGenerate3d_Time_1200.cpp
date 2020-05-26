@@ -7,7 +7,8 @@
 #include "SliceTypeDetector.h"
 #include "DrawCircles.h"
 
-int main() {
+int main()
+{
 
     //==========================================================================================
     //                        ==========       READ FILE        ==========
@@ -15,15 +16,14 @@ int main() {
     // Reading 3d data plane and reference plane
     // /Users/heliu/OneDrive/Data/node-centered
     vtkSmartPointer<vtkMetaImageReader> d3reader =
-            vtkSmartPointer<vtkMetaImageReader>::New();
-    d3reader->SetFileName("/Users/heliu/data/MultiTImeStep/raw/Pressure_T0900.mhd");
+        vtkSmartPointer<vtkMetaImageReader>::New();
+    d3reader->SetFileName("/Users/heliu/data/MultiTImeStep/raw/Pressure_T1200.mhd");
     d3reader->Update();
 
     vtkSmartPointer<vtkMetaImageReader> referencePlaneReader =
-            vtkSmartPointer<vtkMetaImageReader>::New();
+        vtkSmartPointer<vtkMetaImageReader>::New();
     referencePlaneReader->SetFileName("/Users/heliu/data/MultiTImeStep/reference/plane.mhd");
     referencePlaneReader->Update();
-
 
     //==========================================================================================
     //                  ==========       IMAGE DATA        ==========
@@ -41,7 +41,7 @@ int main() {
 
     // 3d outputImageData
     vtkSmartPointer<vtkImageData> outputImageData =
-            vtkSmartPointer<vtkImageData>::New();
+        vtkSmartPointer<vtkImageData>::New();
     outputImageData->SetOrigin(d3InputImageData->GetOrigin());
     outputImageData->SetSpacing(d3InputImageData->GetSpacing());
     outputImageData->SetExtent(d3InputImageData->GetExtent());
@@ -50,48 +50,43 @@ int main() {
     // Data structure for slicing
     // prepare a temp plane to save one slice
     vtkSmartPointer<vtkImageData> workingOriginalPlaneImageData =
-            vtkSmartPointer<vtkImageData>::New();
+        vtkSmartPointer<vtkImageData>::New();
     workingOriginalPlaneImageData->SetOrigin(referenceInfo.Origin);
     workingOriginalPlaneImageData->SetSpacing(referenceInfo.Spacing);
     workingOriginalPlaneImageData->SetExtent(referenceInfo.Extent);
     workingOriginalPlaneImageData->AllocateScalars(VTK_FLOAT, 1);
 
-
     // Data structure for canny
     vtkSmartPointer<vtkImageData> afterCannyImageData =
-            vtkSmartPointer<vtkImageData>::New();
+        vtkSmartPointer<vtkImageData>::New();
     afterCannyImageData->SetOrigin(referenceInfo.Origin);
     afterCannyImageData->SetSpacing(referenceInfo.Spacing);
     afterCannyImageData->SetExtent(referenceInfo.Extent);
     afterCannyImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
-
     vtkSmartPointer<vtkImageData> afterNeighborGrowImageData =
-            vtkSmartPointer<vtkImageData>::New();
+        vtkSmartPointer<vtkImageData>::New();
     afterNeighborGrowImageData->SetOrigin(referenceInfo.Origin);
     afterNeighborGrowImageData->SetSpacing(referenceInfo.Spacing);
     afterNeighborGrowImageData->SetExtent(referenceInfo.Extent);
     afterNeighborGrowImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
-
     vtkSmartPointer<vtkImageData> afterDrawCircleImageData =
-            vtkSmartPointer<vtkImageData>::New();
+        vtkSmartPointer<vtkImageData>::New();
     afterDrawCircleImageData->SetOrigin(referenceInfo.Origin);
     afterDrawCircleImageData->SetSpacing(referenceInfo.Spacing);
     afterDrawCircleImageData->SetExtent(referenceInfo.Extent);
     afterDrawCircleImageData->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
-
     vtkSmartPointer<vtkImageData> afterMultiply =
-            vtkSmartPointer<vtkImageData>::New();
+        vtkSmartPointer<vtkImageData>::New();
     afterMultiply->SetOrigin(referenceInfo.Origin);
     afterMultiply->SetSpacing(referenceInfo.Spacing);
     afterMultiply->SetExtent(referenceInfo.Extent);
     afterMultiply->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
-
     vtkSmartPointer<vtkMetaImageWriter> writer =
-            vtkSmartPointer<vtkMetaImageWriter>::New();
+        vtkSmartPointer<vtkMetaImageWriter>::New();
 
     //==========================================================================================
     //                  ==========       ALGORITHM        ==========
@@ -122,8 +117,9 @@ int main() {
     //                        ==========       RUN        ==========
     //==========================================================================================
 
-    for (int i = 0; i < 400; i++) {
-//    for (int i = 44; i < 46; i++) {
+    for (int i = 0; i < 400; i++)
+    {
+        //    for (int i = 44; i < 46; i++) {
 
         cout << "Now doing " << i << "th Plane! " << endl;
         // 1. 切面
@@ -146,20 +142,24 @@ int main() {
         int numConnectedArea = intersections.size() / 2;
         vector<vector<int>> vecConnectedArea(numConnectedArea, vector<int>());
         // 如果相连区域较多，很可能是检测出了问题
-        if (numConnectedArea <= 50) {
-            for (int j = 0; j < numConnectedArea; j++) {
+        if (numConnectedArea <= 50)
+        {
+            for (int j = 0; j < numConnectedArea; j++)
+            {
                 sliceTypeDetector.findConnectedArea(intersections[j], vecConnectedArea[j]);
             }
         }
 
-//        sliceTypeDetector.findConnectedArea(intersections[1], connectedArea0);
-//        sliceTypeDetector.findConnectedArea(intersections[2], connectedArea1);
-//
+        //        sliceTypeDetector.findConnectedArea(intersections[1], connectedArea0);
+        //        sliceTypeDetector.findConnectedArea(intersections[2], connectedArea1);
+        //
         vector<bool> vecIsCircle(numConnectedArea, false);
 
         // 如果相连区域较多，很可能是检测出了问题
-        if (numConnectedArea <= 50) {
-            for (int j = 0; j < numConnectedArea; j++) {
+        if (numConnectedArea <= 50)
+        {
+            for (int j = 0; j < numConnectedArea; j++)
+            {
                 vecIsCircle[j] = sliceTypeDetector.thisConnectedAreaIsCircle(vecConnectedArea[j]);
 
                 cout << "area " << j << " is circle ? " << vecIsCircle[j] << endl;
@@ -169,122 +169,222 @@ int main() {
         vector<vector<int> *> vecPCircles;
 
         // 如果相连区域较多，很可能是检测出了问题
-        if (numConnectedArea <= 50) {
-            for (int j = 0; j < numConnectedArea; j++) {
-                if (vecIsCircle[j]) {
+        if (numConnectedArea <= 50)
+        {
+            for (int j = 0; j < numConnectedArea; j++)
+            {
+                if (vecIsCircle[j])
+                {
                     vecPCircles.push_back(&(vecConnectedArea[j]));
                 }
             }
             cout << "Circle num is " << vecPCircles.size() << endl;
-
         }
 
         // Draw Circles
-        if (i == 44 || i == 45) {
-            // 只保留 0 号圈 1 号圈 3 号圈
+        if (i == 0 || i == 1 || (i >= 4 && i <= 7) || (i >= 230 && i <= 234) || i == 240 || i == 241 || i == 258 || i == 259 || (i >= 266 && i <= 271) || i == 368 || i == 369)
+        {
             drawCircles.setInputImageData(afterCannyImageData);
             drawCircles.setOutputImageData(afterDrawCircleImageData);
             vector<int> allCircle;
-            for (auto elem : *vecPCircles[0]) {
+            for (auto elem : *vecPCircles[0])
+            {
                 allCircle.push_back(elem);
             }
-            for (auto elem : *vecPCircles[1]) {
-                allCircle.push_back(elem);
-            }
-            for (auto elem : *vecPCircles[3]) {
-                allCircle.push_back(elem);
-            }
-            drawCircles.setCirclesToDraw(allCircle);
-            drawCircles.run();
-
-        } else if (i == 52 || i == 53) {
-            // 只保留 0 号圈 3 号圈 5 号圈
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            vector<int> allCircle;
-            for (auto elem : *vecPCircles[0]) {
-                allCircle.push_back(elem);
-            }
-            for (auto elem : *vecPCircles[3]) {
-                allCircle.push_back(elem);
-            }
-            for (auto elem : *vecPCircles[5]) {
-                allCircle.push_back(elem);
-            }
-            drawCircles.setCirclesToDraw(allCircle);
-            drawCircles.run();
-
-        } else if (i == 346 || i == 347) {
-            // 只保留 0 号圈 3 号圈
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            vector<int> allCircle;
-            for (auto elem : *vecPCircles[0]) {
-                allCircle.push_back(elem);
-            }
-            for (auto elem : *vecPCircles[3]) {
-                allCircle.push_back(elem);
-            }
-            drawCircles.setCirclesToDraw(allCircle);
-            drawCircles.run();
-
-        } else if (i == 354 || i == 355) {
-            // 只保留 0 号圈 1 号圈
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            vector<int> allCircle;
-            for (auto elem : *vecPCircles[0]) {
-                allCircle.push_back(elem);
-            }
-            for (auto elem : *vecPCircles[1]) {
-                allCircle.push_back(elem);
-            }
-            drawCircles.setCirclesToDraw(allCircle);
-            drawCircles.run();
-
-        } else if ((i >= 18 && i <= 73)) {
-            // 只保留 0 号圈 2 号圈 4 号圈
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            vector<int> allCircle;
-            for (auto elem : *vecPCircles[0]) {
-                allCircle.push_back(elem);
-            }
-            for (auto elem : *vecPCircles[2]) {
-                allCircle.push_back(elem);
-            }
-            for (auto elem : *vecPCircles[4]) {
-                allCircle.push_back(elem);
-            }
-            drawCircles.setCirclesToDraw(allCircle);
-            drawCircles.run();
-        } else {
-            // 只保留 0 号圈 和 2 号圈
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            vector<int> allCircle;
-            for (auto elem : *vecPCircles[0]) {
-                allCircle.push_back(elem);
-            }
-            for (auto elem : *vecPCircles[2]) {
+            for (auto elem : *vecPCircles[2])
+            {
                 allCircle.push_back(elem);
             }
             drawCircles.setCirclesToDraw(allCircle);
             drawCircles.run();
         }
-
-
+        else if (i >= 374 && i <= 375)
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[4])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else if (i >= 216 && i <= 399)
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[3])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else if (i >= 8 && i <= 13)
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[3])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else if (i == 2 || i == 3)
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else if (i == 14 || i == 15)
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[3])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else if (i >= 16 && i <= 25)
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[3])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[4])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else if ((i >= 128 && i <= 133) || (i == 140) || i == 141 || i == 158 || i == 159 ||
+                 (i >= 164 && i <= 169) || (i >= 184 && i <= 187) || (i >= 212 && i <= 215))
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[2])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[3])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else if (i == 30 || i == 31 || i == 190 || i == 191 || (i >= 198 && i <= 201) || i == 208 || i == 209)
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[2])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[3])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else if ((i >= 192 && i <= 197) || (i >= 202 && i <= 207))
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[1])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[2])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
+        else
+        {
+            drawCircles.setInputImageData(afterCannyImageData);
+            drawCircles.setOutputImageData(afterDrawCircleImageData);
+            vector<int> allCircle;
+            for (auto elem : *vecPCircles[0])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[3])
+            {
+                allCircle.push_back(elem);
+            }
+            for (auto elem : *vecPCircles[4])
+            {
+                allCircle.push_back(elem);
+            }
+            drawCircles.setCirclesToDraw(allCircle);
+            drawCircles.run();
+        }
         // 3. Neighbor Growing
         neighborGrowing.setInputImageData(afterDrawCircleImageData);
         neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
         neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
         neighborGrowing.run();
 
+        auto planePointerOf3dOutputData = (unsigned char *)(outputImageData->GetScalarPointerForExtent(
+            thisSliceExtent));
 
-        auto planePointerOf3dOutputData = (unsigned char *) (outputImageData->GetScalarPointerForExtent(
-                thisSliceExtent));
-
-        auto afterNeighborGrowPointer = (unsigned char *) (afterNeighborGrowImageData->GetScalarPointer());
+        auto afterNeighborGrowPointer = (unsigned char *)(afterNeighborGrowImageData->GetScalarPointer());
 
         int dims[3];
         afterNeighborGrowImageData->GetDimensions(dims);
@@ -298,12 +398,9 @@ int main() {
     }
 
     std::string _fileName;
-    _fileName = "/Users/heliu/data/MultiTImeStep/result/time900/3d.mhd";
+    _fileName = "/Users/heliu/data/MultiTImeStep/result/time1200/3d.mhd";
 
     writer->SetInputData(outputImageData);
     writer->SetFileName(_fileName.c_str());
     writer->Write();
 }
-
-
-

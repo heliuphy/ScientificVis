@@ -16,7 +16,7 @@ int main() {
     // /Users/heliu/OneDrive/Data/node-centered
     vtkSmartPointer<vtkMetaImageReader> d3reader =
             vtkSmartPointer<vtkMetaImageReader>::New();
-    d3reader->SetFileName("/Users/heliu/data/MultiTImeStep/raw/Pressure_T0900.mhd");
+    d3reader->SetFileName("/Users/heliu/data/MultiTImeStep/raw/Pressure_T1200.mhd");
     d3reader->Update();
 
     vtkSmartPointer<vtkMetaImageReader> referencePlaneReader =
@@ -180,58 +180,26 @@ int main() {
         }
 
         // Draw Circles
-        if ((i >= 0 && i <= 59) || (i >= 340 && i <= 399)) {
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            drawCircles.outputImageClear();
-        }
-        if ((i >= 60 && i <= 63) || (i >= 336 && i <= 339)) {
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            drawCircles.copyInputToOutput();
-        }
-        if ((i >= 64 && i <= 157) || (i >= 242 && i <= 335)) {
-            // 只保留 0 号圈
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            drawCircles.setCirclesToDraw(*vecPCircles[0]);
-            drawCircles.run();
-        }
-        if (i >= 158 && i <= 241) {
-            // 只保留 0 号圈 和 2 号圈
-            drawCircles.setInputImageData(afterCannyImageData);
-            drawCircles.setOutputImageData(afterDrawCircleImageData);
-            vector<int> allCircle;
-            for (auto elem : *vecPCircles[0]) {
+        drawCircles.setInputImageData(afterCannyImageData);
+        drawCircles.setOutputImageData(afterDrawCircleImageData);
+        vector<int> allCircle;
+        for (auto pCircle : vecPCircles) {
+            for (auto elem : *pCircle) {
                 allCircle.push_back(elem);
             }
-            for (auto elem : *vecPCircles[2]) {
-                allCircle.push_back(elem);
-            }
-            drawCircles.setCirclesToDraw(allCircle);
-            drawCircles.run();
         }
+        drawCircles.setCirclesToDraw(allCircle);
+        drawCircles.run();
 
 
-        // 3. Neighbor Growing
-        neighborGrowing.setInputImageData(afterDrawCircleImageData);
-        neighborGrowing.setOutputImageData(afterNeighborGrowImageData);
-        neighborGrowing.setMode(GROW_ON_ALL_IMAGE);
-        neighborGrowing.run();
-
-
-        auto planePointerOf3dOutputData = (unsigned char *) (outputImageData->GetScalarPointerForExtent(
-                thisSliceExtent));
-
-
-        multiply255.setInputImageData(afterNeighborGrowImageData);
+        multiply255.setInputImageData(afterDrawCircleImageData);
         multiply255.setOutputImageData(afterMultiply);
         multiply255.setOperatorToMultiplyK(255);
         multiply255.run();
 
         std::string _path;
         std::string _fileName;
-        _path = "/Users/heliu/data/MultiTImeStep/neighborGrow400/time300/";
+        _path = "/Users/heliu/data/MultiTImeStep/OnlyCircle400/time1200/";
         _fileName = _path + std::to_string(i) + ".png";
 
         bool writeFile = true;
@@ -241,7 +209,7 @@ int main() {
             writer->Write();
         }
 
-        neighborGrowing.outputImageClear();
+//        neighborGrowing.outputImageClear();
         sliceTypeDetector.initializeParams();
     }
 
